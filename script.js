@@ -2,7 +2,7 @@
 // This file contains all the interactive logic for our quiz app
 // We're using ES6+ features: arrow functions, template literals, destructuring, etc.
 
-// DOM Elements - Selecting elements we'll interact with
+// DOM Elements
 const screens = {
     welcome: document.getElementById('welcome-screen'),
     quiz: document.getElementById('quiz-screen'),
@@ -11,20 +11,30 @@ const screens = {
 
 const buttons = {
     startQuiz: document.getElementById('start-quiz-btn'),
+    login: document.getElementById('login-btn'),
     prev: document.getElementById('prev-btn'),
     next: document.getElementById('next-btn'),
     submit: document.getElementById('submit-btn'),
     retake: document.getElementById('retake-btn'),
     viewHighscores: document.getElementById('view-highscores-btn'),
     newQuiz: document.getElementById('new-quiz-btn'),
-    signup: document.getElementById('signup-btn')
+    signup: document.getElementById('signup-btn'),
+    logout: document.getElementById('logout-btn'),
+    hint: document.getElementById('hint-btn'),
+    skip: document.getElementById('skip-btn'),
+    messageOk: document.getElementById('message-ok-btn')
 };
 
 const inputs = {
     username: document.getElementById('username-input'),
+    password: document.getElementById('password-input'),
     modalUsername: document.getElementById('modal-username'),
+    modalPassword: document.getElementById('modal-password'),
+    confirmPassword: document.getElementById('confirm-password'),
     fullname: document.getElementById('fullname'),
-    email: document.getElementById('email')
+    email: document.getElementById('email'),
+    loginUsername: document.getElementById('login-username'),
+    loginPassword: document.getElementById('login-password')
 };
 
 const displays = {
@@ -36,26 +46,36 @@ const displays = {
     optionsContainer: document.getElementById('options-container'),
     quizTopic: document.getElementById('quiz-topic'),
     progress: document.getElementById('progress'),
+    progressPercentage: document.getElementById('progress-percentage'),
+    currentQuestion: document.getElementById('current-question'),
     finalScore: document.getElementById('final-score'),
     correctAnswers: document.getElementById('correct-answers'),
     timeUsed: document.getElementById('time-used'),
     performance: document.getElementById('performance'),
     resultsMessage: document.getElementById('results-message'),
-    highscoresList: document.getElementById('highscores-list')
+    highscoresList: document.getElementById('highscores-list'),
+    userDisplay: document.getElementById('user-display')
 };
 
-const modal = {
-    element: document.getElementById('signup-modal'),
-    close: document.querySelector('.close-modal'),
-    form: document.getElementById('signup-form')
+const modals = {
+    signup: document.getElementById('signup-modal'),
+    login: document.getElementById('login-modal'),
+    message: document.getElementById('message-modal')
+};
+
+const messageElements = {
+    title: document.getElementById('message-title'),
+    icon: document.getElementById('message-icon'),
+    text: document.getElementById('message-text')
 };
 
 const languageButtons = document.querySelectorAll('.lang-btn');
 
-// Quiz State - This object holds all the data about the current quiz
+// Quiz State
 let quizState = {
     currentScreen: 'welcome',
-    username: localStorage.getItem('qalicode-username') || 'Guest',
+    username: 'Guest',
+    isLoggedIn: false,
     selectedLanguage: 'html',
     questions: [],
     currentQuestionIndex: 0,
@@ -63,11 +83,17 @@ let quizState = {
     timer: 60,
     timerInterval: null,
     userAnswers: [],
-    quizStarted: false
+    quizStarted: false,
+    hintsUsed: 0,
+    questionsSkipped: 0
 };
 
-// Quiz Questions Database
-// Each question is an object with properties: question, options, correctAnswer, and explanation
+// User Authentication System
+const users = JSON.parse(localStorage.getItem('qalicode-users')) || [
+    { username: 'admin', password: 'admin123', fullname: 'Admin User', email: 'admin@qalicode.com' }
+];
+
+// Questions Database
 const questionsDatabase = {
     html: [
         {
@@ -79,13 +105,15 @@ const questionsDatabase = {
                 "Home Tool Markup Language"
             ],
             correctAnswer: 0,
-            explanation: "HTML stands for Hyper Text Markup Language, which is the standard markup language for creating web pages."
+            explanation: "HTML stands for Hyper Text Markup Language, which is the standard markup language for creating web pages.",
+            difficulty: "beginner"
         },
         {
             question: "Which HTML element is used for the largest heading?",
             options: ["&lt;h6&gt;", "&lt;head&gt;", "&lt;h1&gt;", "&lt;heading&gt;"],
             correctAnswer: 2,
-            explanation: "The &lt;h1&gt; element is used for the most important heading (largest), while &lt;h6&gt; is for the least important."
+            explanation: "The &lt;h1&gt; element is used for the most important heading (largest), while &lt;h6&gt; is for the least important.",
+            difficulty: "beginner"
         },
         {
             question: "What is the correct HTML for creating a hyperlink?",
@@ -96,13 +124,15 @@ const questionsDatabase = {
                 "&lt;link&gt;http://example.com&lt;/link&gt;"
             ],
             correctAnswer: 1,
-            explanation: "The &lt;a&gt; tag with the 'href' attribute creates a hyperlink in HTML."
+            explanation: "The &lt;a&gt; tag with the 'href' attribute creates a hyperlink in HTML.",
+            difficulty: "beginner"
         },
         {
             question: "Which attribute is used to provide a unique name for an HTML element?",
             options: ["class", "id", "type", "name"],
             correctAnswer: 1,
-            explanation: "The 'id' attribute provides a unique identifier for an HTML element."
+            explanation: "The 'id' attribute provides a unique identifier for an HTML element.",
+            difficulty: "intermediate"
         },
         {
             question: "What is the purpose of the &lt;head&gt; element in HTML?",
@@ -113,7 +143,8 @@ const questionsDatabase = {
                 "To define a section for navigation links"
             ],
             correctAnswer: 1,
-            explanation: "The &lt;head&gt; element contains metadata (data about data) like title, character set, styles, scripts, etc."
+            explanation: "The &lt;head&gt; element contains metadata (data about data) like title, character set, styles, scripts, etc.",
+            difficulty: "intermediate"
         }
     ],
     css: [
@@ -126,25 +157,29 @@ const questionsDatabase = {
                 "Colorful Style Sheets"
             ],
             correctAnswer: 1,
-            explanation: "CSS stands for Cascading Style Sheets, used to style HTML elements."
+            explanation: "CSS stands for Cascading Style Sheets, used to style HTML elements.",
+            difficulty: "beginner"
         },
         {
             question: "Which CSS property controls the text size?",
             options: ["font-style", "text-size", "font-size", "text-style"],
             correctAnswer: 2,
-            explanation: "The 'font-size' property controls the size of text in CSS."
+            explanation: "The 'font-size' property controls the size of text in CSS.",
+            difficulty: "beginner"
         },
         {
             question: "How do you select an element with id 'header' in CSS?",
             options: [".header", "#header", "*header", "header"],
             correctAnswer: 1,
-            explanation: "In CSS, the '#' symbol is used to select elements by their id attribute."
+            explanation: "In CSS, the '#' symbol is used to select elements by their id attribute.",
+            difficulty: "beginner"
         },
         {
             question: "Which property is used to change the background color?",
             options: ["color", "bgcolor", "background-color", "bg-color"],
             correctAnswer: 2,
-            explanation: "The 'background-color' property sets the background color of an element."
+            explanation: "The 'background-color' property sets the background color of an element.",
+            difficulty: "beginner"
         },
         {
             question: "How do you make each word in a text start with a capital letter?",
@@ -155,7 +190,8 @@ const questionsDatabase = {
                 "font-variant: small-caps"
             ],
             correctAnswer: 0,
-            explanation: "The 'text-transform: capitalize' property makes the first character of each word uppercase."
+            explanation: "The 'text-transform: capitalize' property makes the first character of each word uppercase.",
+            difficulty: "intermediate"
         }
     ],
     js: [
@@ -163,7 +199,8 @@ const questionsDatabase = {
             question: "Which of the following is a JavaScript data type?",
             options: ["Number", "Array", "Boolean", "All of the above"],
             correctAnswer: 3,
-            explanation: "JavaScript has several data types including Number, String, Boolean, Object, Array, etc."
+            explanation: "JavaScript has several data types including Number, String, Boolean, Object, Array, etc.",
+            difficulty: "beginner"
         },
         {
             question: "How do you write 'Hello World' in an alert box?",
@@ -174,7 +211,8 @@ const questionsDatabase = {
                 "msgBox('Hello World');"
             ],
             correctAnswer: 0,
-            explanation: "The alert() function displays an alert box with a specified message."
+            explanation: "The alert() function displays an alert box with a specified message.",
+            difficulty: "beginner"
         },
         {
             question: "How do you create a function in JavaScript?",
@@ -185,7 +223,8 @@ const questionsDatabase = {
                 "create myFunction()"
             ],
             correctAnswer: 0,
-            explanation: "Functions in JavaScript are declared using the 'function' keyword followed by the function name and parentheses."
+            explanation: "Functions in JavaScript are declared using the 'function' keyword followed by the function name and parentheses.",
+            difficulty: "beginner"
         },
         {
             question: "How to write an IF statement in JavaScript?",
@@ -196,7 +235,8 @@ const questionsDatabase = {
                 "if i = 5 then"
             ],
             correctAnswer: 0,
-            explanation: "The correct syntax for an IF statement is: if (condition) { // code to execute }"
+            explanation: "The correct syntax for an IF statement is: if (condition) { // code to execute }",
+            difficulty: "beginner"
         },
         {
             question: "How does a WHILE loop start?",
@@ -207,20 +247,27 @@ const questionsDatabase = {
                 "while i <= 10"
             ],
             correctAnswer: 0,
-            explanation: "A WHILE loop starts with the 'while' keyword followed by a condition in parentheses."
+            explanation: "A WHILE loop starts with the 'while' keyword followed by a condition in parentheses.",
+            difficulty: "intermediate"
         }
     ]
 };
 
-// Highscores Data - Stored in localStorage
+// Highscores Data
 let highscores = JSON.parse(localStorage.getItem('qalicode-highscores')) || [];
 
 // Initialize the App
 function initApp() {
     console.log("Initializing QALICODE Quiz App...");
     
-    // Set username display
-    displays.username.textContent = quizState.username;
+    // Check if user is logged in from localStorage
+    const savedUser = localStorage.getItem('qalicode-current-user');
+    if (savedUser) {
+        const user = JSON.parse(savedUser);
+        quizState.username = user.username;
+        quizState.isLoggedIn = true;
+        updateUserDisplay();
+    }
     
     // Set up event listeners
     setupEventListeners();
@@ -236,10 +283,9 @@ function initApp() {
 function setupEventListeners() {
     console.log("Setting up event listeners...");
     
-    // Start quiz button
+    // Quiz buttons
     buttons.startQuiz.addEventListener('click', startQuiz);
-    
-    // Quiz navigation buttons
+    buttons.login.addEventListener('click', openLoginModal);
     buttons.prev.addEventListener('click', showPreviousQuestion);
     buttons.next.addEventListener('click', showNextQuestion);
     buttons.submit.addEventListener('click', submitQuiz);
@@ -249,32 +295,45 @@ function setupEventListeners() {
     buttons.viewHighscores.addEventListener('click', viewHighscores);
     buttons.newQuiz.addEventListener('click', newQuiz);
     
-    // Signup button
+    // Auth buttons
     buttons.signup.addEventListener('click', openSignupModal);
+    buttons.logout.addEventListener('click', logoutUser);
     
     // Modal events
-    modal.close.addEventListener('click', closeSignupModal);
-    modal.form.addEventListener('submit', handleSignupSubmit);
+    document.querySelectorAll('.close-modal').forEach(btn => {
+        btn.addEventListener('click', closeAllModals);
+    });
+    
+    document.getElementById('signup-form').addEventListener('submit', handleSignupSubmit);
+    document.getElementById('login-form').addEventListener('submit', handleLoginSubmit);
+    buttons.messageOk.addEventListener('click', () => closeModal('message'));
+    
+    // Modal navigation links
+    document.getElementById('login-link').addEventListener('click', (e) => {
+        e.preventDefault();
+        closeModal('signup');
+        openLoginModal();
+    });
+    
+    document.getElementById('signup-link').addEventListener('click', (e) => {
+        e.preventDefault();
+        closeModal('login');
+        openSignupModal();
+    });
     
     // Language selection buttons
     languageButtons.forEach(button => {
         button.addEventListener('click', () => {
-            // Remove active class from all buttons
             languageButtons.forEach(btn => btn.classList.remove('active'));
-            // Add active class to clicked button
             button.classList.add('active');
-            // Update selected language
             quizState.selectedLanguage = button.dataset.language;
             console.log(`Language selected: ${quizState.selectedLanguage}`);
         });
     });
     
-    // Close modal when clicking outside
-    window.addEventListener('click', (event) => {
-        if (event.target === modal.element) {
-            closeSignupModal();
-        }
-    });
+    // Hint and skip buttons
+    buttons.hint.addEventListener('click', showHint);
+    buttons.skip.addEventListener('click', skipQuestion);
     
     // Handle Enter key on username input
     inputs.username.addEventListener('keypress', (event) => {
@@ -282,6 +341,228 @@ function setupEventListeners() {
             startQuiz();
         }
     });
+    
+    // Close modal when clicking outside
+    window.addEventListener('click', (event) => {
+        if (event.target.classList.contains('modal')) {
+            closeAllModals();
+        }
+    });
+}
+
+// Update user display
+function updateUserDisplay() {
+    displays.username.textContent = quizState.username;
+    if (quizState.isLoggedIn) {
+        displays.userDisplay.style.display = 'flex';
+        buttons.logout.style.display = 'block';
+        buttons.signup.style.display = 'none';
+        displays.userDisplay.innerHTML = `
+            <i class="fas fa-user-circle"></i>
+            <span>${quizState.username}</span>
+        `;
+    } else {
+        displays.userDisplay.style.display = 'flex';
+        buttons.logout.style.display = 'none';
+        buttons.signup.style.display = 'block';
+        displays.userDisplay.innerHTML = `
+            <i class="fas fa-user"></i>
+            <span>Guest</span>
+        `;
+    }
+}
+
+// Show message modal
+function showMessage(title, text, type = 'info') {
+    messageElements.title.textContent = title;
+    messageElements.text.textContent = text;
+    
+    // Set icon based on type
+    const icon = messageElements.icon.querySelector('i');
+    icon.className = {
+        'success': 'fas fa-check-circle',
+        'error': 'fas fa-exclamation-circle',
+        'warning': 'fas fa-exclamation-triangle',
+        'info': 'fas fa-info-circle'
+    }[type] || 'fas fa-info-circle';
+    
+    // Set icon color based on type
+    messageElements.icon.style.color = {
+        'success': 'var(--success)',
+        'error': 'var(--danger)',
+        'warning': 'var(--warning)',
+        'info': 'var(--primary)'
+    }[type] || 'var(--primary)';
+    
+    openModal('message');
+}
+
+// Modal functions
+function openModal(modalName) {
+    modals[modalName].style.display = 'flex';
+}
+
+function closeModal(modalName) {
+    modals[modalName].style.display = 'none';
+}
+
+function closeAllModals() {
+    Object.values(modals).forEach(modal => {
+        modal.style.display = 'none';
+    });
+}
+
+// Open signup modal
+function openSignupModal() {
+    openModal('signup');
+    document.getElementById('signup-form').reset();
+}
+
+// Open login modal
+function openLoginModal() {
+    openModal('login');
+    document.getElementById('login-form').reset();
+}
+
+// Handle signup form submission
+function handleSignupSubmit(event) {
+    event.preventDefault();
+    
+    // Get form values
+    const fullname = inputs.fullname.value.trim();
+    const email = inputs.email.value.trim();
+    const username = inputs.modalUsername.value.trim();
+    const password = inputs.modalPassword.value.trim();
+    const confirmPassword = inputs.confirmPassword.value.trim();
+    
+    // Clear previous errors
+    document.querySelectorAll('.error-message').forEach(el => {
+        el.style.display = 'none';
+    });
+    
+    // Validation
+    let hasError = false;
+    
+    if (username.length < 3) {
+        document.getElementById('username-error').textContent = 'Username must be at least 3 characters';
+        document.getElementById('username-error').style.display = 'block';
+        hasError = true;
+    }
+    
+    if (users.find(user => user.username === username)) {
+        document.getElementById('username-error').textContent = 'Username already exists';
+        document.getElementById('username-error').style.display = 'block';
+        hasError = true;
+    }
+    
+    if (password.length < 6) {
+        document.getElementById('password-error').textContent = 'Password must be at least 6 characters';
+        document.getElementById('password-error').style.display = 'block';
+        hasError = true;
+    }
+    
+    if (password !== confirmPassword) {
+        document.getElementById('confirm-error').textContent = 'Passwords do not match';
+        document.getElementById('confirm-error').style.display = 'block';
+        hasError = true;
+    }
+    
+    if (!email.includes('@') || !email.includes('.')) {
+        document.getElementById('email-error').textContent = 'Please enter a valid email';
+        document.getElementById('email-error').style.display = 'block';
+        hasError = true;
+    }
+    
+    if (hasError) return;
+    
+    // Create new user
+    const newUser = {
+        username,
+        password,
+        fullname,
+        email,
+        createdAt: new Date().toISOString()
+    };
+    
+    // Add to users array
+    users.push(newUser);
+    
+    // Save to localStorage
+    localStorage.setItem('qalicode-users', JSON.stringify(users));
+    
+    // Auto-login the new user
+    loginUser(username, password);
+    
+    // Show success message
+    showMessage('Success!', `Welcome to QALICODE, ${username}! Your account has been created successfully.`, 'success');
+    
+    // Close modal
+    closeModal('signup');
+}
+
+// Handle login form submission
+function handleLoginSubmit(event) {
+    event.preventDefault();
+    
+    const username = inputs.loginUsername.value.trim();
+    const password = inputs.loginPassword.value.trim();
+    
+    // Clear previous errors
+    document.querySelectorAll('.error-message').forEach(el => {
+        el.style.display = 'none';
+    });
+    
+    // Attempt login
+    if (loginUser(username, password)) {
+        closeModal('login');
+    } else {
+        document.getElementById('login-password-error').textContent = 'Invalid username or password';
+        document.getElementById('login-password-error').style.display = 'block';
+    }
+}
+
+// Login function
+function loginUser(username, password) {
+    const user = users.find(u => u.username === username && u.password === password);
+    
+    if (user) {
+        quizState.username = username;
+        quizState.isLoggedIn = true;
+        
+        // Save current user to localStorage
+        localStorage.setItem('qalicode-current-user', JSON.stringify({
+            username: user.username,
+            fullname: user.fullname,
+            email: user.email
+        }));
+        
+        // Update UI
+        updateUserDisplay();
+        inputs.username.value = username;
+        
+        // Show welcome message
+        showMessage('Welcome Back!', `Great to see you again, ${user.fullname || username}!`, 'success');
+        
+        return true;
+    }
+    
+    return false;
+}
+
+// Logout function
+function logoutUser() {
+    quizState.username = 'Guest';
+    quizState.isLoggedIn = false;
+    
+    // Remove current user from localStorage
+    localStorage.removeItem('qalicode-current-user');
+    
+    // Update UI
+    updateUserDisplay();
+    inputs.username.value = '';
+    
+    // Show message
+    showMessage('Logged Out', 'You have been successfully logged out.', 'info');
 }
 
 // Switch between screens
@@ -307,25 +588,39 @@ function switchScreen(screenName) {
 function startQuiz() {
     console.log("Starting quiz...");
     
-    // Get username from input
+    // Check if user is logged in or using guest mode
     const username = inputs.username.value.trim();
+    const password = inputs.password.value.trim();
+    
+    // If username is provided, attempt to login or use as guest
     if (username) {
-        quizState.username = username;
-        displays.username.textContent = username;
-        
-        // Save to localStorage for future use
-        localStorage.setItem('qalicode-username', username);
+        if (!quizState.isLoggedIn) {
+            // Try to login if password is provided
+            if (password) {
+                if (!loginUser(username, password)) {
+                    showMessage('Login Failed', 'Invalid username or password. Please try again or continue as guest.', 'error');
+                    return;
+                }
+            } else {
+                // Use as guest
+                quizState.username = username;
+                quizState.isLoggedIn = false;
+                displays.username.textContent = username;
+            }
+        }
+    } else {
+        // No username provided
+        showMessage('Username Required', 'Please enter a username to start the quiz.', 'warning');
+        return;
     }
     
     // Get questions based on selected language
     if (quizState.selectedLanguage === 'all') {
-        // Mix questions from all categories
         quizState.questions = [
             ...questionsDatabase.html.slice(0, 3),
             ...questionsDatabase.css.slice(0, 3),
             ...questionsDatabase.js.slice(0, 4)
         ];
-        // Shuffle the questions
         quizState.questions = shuffleArray(quizState.questions);
     } else {
         quizState.questions = [...questionsDatabase[quizState.selectedLanguage]];
@@ -336,6 +631,8 @@ function startQuiz() {
     quizState.score = 0;
     quizState.userAnswers = new Array(quizState.questions.length).fill(null);
     quizState.quizStarted = true;
+    quizState.hintsUsed = 0;
+    quizState.questionsSkipped = 0;
     
     // Update quiz topic display
     const languageNames = {
@@ -348,8 +645,9 @@ function startQuiz() {
     displays.quizTopic.textContent = `${languageNames[quizState.selectedLanguage]} Quiz`;
     
     // Update quiz topic icon
-    const topicIcon = document.querySelector('.quiz-topic i');
-    topicIcon.className = getLanguageIcon(quizState.selectedLanguage);
+    const topicIcon = document.querySelector('.topic-icon');
+    topicIcon.innerHTML = getLanguageIcon(quizState.selectedLanguage);
+    topicIcon.style.background = getLanguageGradient(quizState.selectedLanguage);
     
     // Switch to quiz screen
     switchScreen('quiz');
@@ -365,17 +663,21 @@ function startQuiz() {
 function setupQuiz() {
     // Reset progress bar
     displays.progress.style.width = '0%';
+    displays.progressPercentage.textContent = '0%';
     
     // Update score display
     displays.scoreDisplay.textContent = quizState.score;
     
     // Set up timer display
     displays.timer.textContent = `${quizState.timer}s`;
+    displays.timer.style.color = 'var(--dark)';
     
     // Reset navigation buttons
     buttons.prev.disabled = true;
     buttons.next.disabled = false;
     buttons.submit.style.display = 'none';
+    buttons.hint.style.display = 'block';
+    buttons.skip.style.display = 'block';
     
     // Update question counter
     updateQuestionCounter();
@@ -389,6 +691,7 @@ function displayQuestion() {
     
     // Update question text
     displays.questionText.innerHTML = question.question;
+    displays.currentQuestion.textContent = quizState.currentQuestionIndex + 1;
     
     // Clear previous options
     displays.optionsContainer.innerHTML = '';
@@ -418,6 +721,7 @@ function displayQuestion() {
     // Update progress bar
     const progressPercentage = ((quizState.currentQuestionIndex + 1) / quizState.questions.length) * 100;
     displays.progress.style.width = `${progressPercentage}%`;
+    displays.progressPercentage.textContent = `${Math.round(progressPercentage)}%`;
 }
 
 // Select an option
@@ -434,7 +738,7 @@ function selectOption(optionIndex) {
     // Save user's answer
     quizState.userAnswers[quizState.currentQuestionIndex] = optionIndex;
     
-    // Enable next button if not already enabled
+    // Enable next button
     buttons.next.disabled = false;
 }
 
@@ -451,10 +755,28 @@ function updateNavigationButtons() {
     
     // Next button
     const isLastQuestion = quizState.currentQuestionIndex === quizState.questions.length - 1;
-    buttons.next.disabled = isLastQuestion && quizState.userAnswers[quizState.currentQuestionIndex] === null;
+    const hasAnswer = quizState.userAnswers[quizState.currentQuestionIndex] !== null;
     
-    // Submit button (show only on last question)
-    buttons.submit.style.display = isLastQuestion ? 'block' : 'none';
+    buttons.next.disabled = !hasAnswer;
+    buttons.submit.style.display = isLastQuestion && hasAnswer ? 'block' : 'none';
+    
+    // Hint and skip buttons
+    buttons.hint.disabled = false;
+    buttons.skip.disabled = isLastQuestion;
+}
+
+// Show hint
+function showHint() {
+    const question = quizState.questions[quizState.currentQuestionIndex];
+    showMessage('Hint', question.explanation, 'info');
+    quizState.hintsUsed++;
+    buttons.hint.disabled = true;
+}
+
+// Skip question
+function skipQuestion() {
+    quizState.questionsSkipped++;
+    showNextQuestion();
 }
 
 // Show previous question
@@ -471,7 +793,6 @@ function showNextQuestion() {
         quizState.currentQuestionIndex++;
         displayQuestion();
     } else if (quizState.currentQuestionIndex === quizState.questions.length - 1) {
-        // If on last question and answer is selected, allow submit
         if (quizState.userAnswers[quizState.currentQuestionIndex] !== null) {
             submitQuiz();
         }
@@ -480,29 +801,25 @@ function showNextQuestion() {
 
 // Start the quiz timer
 function startTimer() {
-    // Clear any existing timer
     if (quizState.timerInterval) {
         clearInterval(quizState.timerInterval);
     }
     
-    // Reset timer
     quizState.timer = 60;
     displays.timer.textContent = `${quizState.timer}s`;
     
-    // Start countdown
     quizState.timerInterval = setInterval(() => {
         quizState.timer--;
         displays.timer.textContent = `${quizState.timer}s`;
         
-        // Change color when time is running low
         if (quizState.timer <= 10) {
             displays.timer.style.color = 'var(--danger)';
         }
         
-        // Time's up!
         if (quizState.timer <= 0) {
             clearInterval(quizState.timerInterval);
-            submitQuiz();
+            showMessage('Time\'s Up!', 'The quiz timer has expired. Your answers will be submitted.', 'warning');
+            setTimeout(submitQuiz, 2000);
         }
     }, 1000);
 }
@@ -511,14 +828,15 @@ function startTimer() {
 function submitQuiz() {
     console.log("Submitting quiz...");
     
-    // Stop the timer
     clearInterval(quizState.timerInterval);
     
     // Calculate score
     calculateScore();
     
-    // Save highscore
-    saveHighscore();
+    // Save highscore if logged in
+    if (quizState.isLoggedIn) {
+        saveHighscore();
+    }
     
     // Show results screen
     showResults();
@@ -528,27 +846,29 @@ function submitQuiz() {
 function calculateScore() {
     let correctCount = 0;
     
-    // Check each answer
     quizState.questions.forEach((question, index) => {
         if (quizState.userAnswers[index] === question.correctAnswer) {
             correctCount++;
         }
     });
     
-    // Calculate score (base points + time bonus)
     const baseScore = correctCount * 10;
-    const timeBonus = Math.floor(quizState.timer * 0.5); // 0.5 points per second remaining
-    quizState.score = baseScore + timeBonus;
+    const timeBonus = Math.floor(quizState.timer * 0.5);
+    const hintPenalty = quizState.hintsUsed * 5;
+    const skipPenalty = quizState.questionsSkipped * 3;
     
-    console.log(`Correct answers: ${correctCount}/${quizState.questions.length}`);
-    console.log(`Score: ${quizState.score} (${baseScore} base + ${timeBonus} time bonus)`);
+    quizState.score = baseScore + timeBonus - hintPenalty - skipPenalty;
+    
+    // Ensure score doesn't go below 0
+    quizState.score = Math.max(0, quizState.score);
+    
+    console.log(`Score: ${quizState.score} (${baseScore} base + ${timeBonus} time - ${hintPenalty} hints - ${skipPenalty} skips)`);
     
     return { correctCount, total: quizState.questions.length };
 }
 
 // Show results screen
 function showResults() {
-    // Calculate results
     const { correctCount, total } = calculateScore();
     
     // Update results displays
@@ -559,33 +879,38 @@ function showResults() {
     // Set performance rating
     const percentage = (correctCount / total) * 100;
     let performance = "";
+    let message = "";
     
     if (percentage >= 90) {
         performance = "Expert";
-        displays.resultsMessage.textContent = "Outstanding! You're a coding expert! 🎉";
+        message = "Outstanding! You're a coding expert! 🎉";
     } else if (percentage >= 70) {
         performance = "Advanced";
-        displays.resultsMessage.textContent = "Great job! You have strong coding knowledge! 👍";
+        message = "Great job! You have strong coding knowledge! 👍";
     } else if (percentage >= 50) {
         performance = "Intermediate";
-        displays.resultsMessage.textContent = "Good effort! Keep practicing to improve! 💪";
+        message = "Good effort! Keep practicing to improve! 💪";
     } else {
         performance = "Beginner";
-        displays.resultsMessage.textContent = "Keep learning! Every expert was once a beginner. 📚";
+        message = "Keep learning! Every expert was once a beginner. 📚";
+    }
+    
+    // Add login reminder if not logged in
+    if (!quizState.isLoggedIn) {
+        message += "\n\nCreate an account to save your scores and track your progress!";
     }
     
     displays.performance.textContent = performance;
+    displays.resultsMessage.textContent = message;
     
     // Animate the score circle
     const circle = document.querySelector('.score-circle-progress');
-    const circumference = 2 * Math.PI * 54; // 2πr
+    const circumference = 2 * Math.PI * 70;
     const offset = circumference - (percentage / 100) * circumference;
     
-    // Set initial state
     circle.style.strokeDasharray = circumference;
     circle.style.strokeDashoffset = circumference;
     
-    // Animate to final value
     setTimeout(() => {
         circle.style.strokeDashoffset = offset;
     }, 300);
@@ -607,20 +932,14 @@ function saveHighscore() {
         timestamp: Date.now()
     };
     
-    // Add to highscores array
     highscores.push(highscore);
-    
-    // Sort by score (descending)
     highscores.sort((a, b) => b.score - a.score);
     
-    // Keep only top 10 scores
     if (highscores.length > 10) {
         highscores = highscores.slice(0, 10);
     }
     
-    // Save to localStorage
     localStorage.setItem('qalicode-highscores', JSON.stringify(highscores));
-    
     console.log("Highscore saved:", highscore);
 }
 
@@ -634,7 +953,6 @@ function updateHighscoresDisplay() {
         return;
     }
     
-    // Display top 10 highscores
     highscores.slice(0, 10).forEach((highscore, index) => {
         const highscoreItem = document.createElement('div');
         highscoreItem.className = `highscore-item ${highscore.username === quizState.username ? 'current-user' : ''}`;
@@ -659,7 +977,6 @@ function retakeQuiz() {
 // View highscores
 function viewHighscores() {
     updateHighscoresDisplay();
-    // Already on results screen, no need to switch
 }
 
 // Start a new quiz
@@ -668,55 +985,7 @@ function newQuiz() {
     switchScreen('welcome');
 }
 
-// Open signup modal
-function openSignupModal() {
-    console.log("Opening signup modal...");
-    modal.element.style.display = 'flex';
-    
-    // Pre-fill username if available
-    if (quizState.username !== 'Guest') {
-        inputs.modalUsername.value = quizState.username;
-    }
-}
-
-// Close signup modal
-function closeSignupModal() {
-    modal.element.style.display = 'none';
-    modal.form.reset();
-}
-
-// Handle signup form submission
-function handleSignupSubmit(event) {
-    event.preventDefault();
-    console.log("Handling signup submission...");
-    
-    // Get form values
-    const fullname = inputs.fullname.value.trim();
-    const email = inputs.email.value.trim();
-    const username = inputs.modalUsername.value.trim();
-    
-    // Basic validation
-    if (!username || !email) {
-        alert("Please fill in all required fields");
-        return;
-    }
-    
-    // Update username
-    quizState.username = username;
-    displays.username.textContent = username;
-    inputs.username.value = username;
-    
-    // Save to localStorage
-    localStorage.setItem('qalicode-username', username);
-    
-    // Show success message
-    alert(`Welcome to QALICODE, ${username}! Your account has been created.`);
-    
-    // Close modal
-    closeSignupModal();
-}
-
-// Utility function to shuffle array (Fisher-Yates algorithm)
+// Utility functions
 function shuffleArray(array) {
     const newArray = [...array];
     for (let i = newArray.length - 1; i > 0; i--) {
@@ -726,13 +995,21 @@ function shuffleArray(array) {
     return newArray;
 }
 
-// Get language icon class
 function getLanguageIcon(language) {
     switch (language) {
-        case 'html': return 'fab fa-html5 html-icon';
-        case 'css': return 'fab fa-css3-alt css-icon';
-        case 'js': return 'fab fa-js-square js-icon';
-        default: return 'fas fa-code';
+        case 'html': return '<i class="fab fa-html5"></i>';
+        case 'css': return '<i class="fab fa-css3-alt"></i>';
+        case 'js': return '<i class="fab fa-js-square"></i>';
+        default: return '<i class="fas fa-code"></i>';
+    }
+}
+
+function getLanguageGradient(language) {
+    switch (language) {
+        case 'html': return 'linear-gradient(135deg, var(--html-color), #FF6B35)';
+        case 'css': return 'linear-gradient(135deg, var(--css-color), #2965F1)';
+        case 'js': return 'linear-gradient(135deg, var(--js-color), #F0DB4F)';
+        default: return 'var(--gradient-primary)';
     }
 }
 

@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QALICODE - Interactive Coding Quiz</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&family=Source+Code+Pro:wght@400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Header with Logo -->
+    <header>
+        <div class="container header-content">
+            <div class="logo-container">
+                <h1 class="logo">
+                    <span class="logo-icon"><i class="fas fa-code"></i></span>
+                    <span class="logo-text">QALICODE</span>
+                </h1>
+                <p class="tagline">Master Web Development Through Quizzes</p>
+            </div>
+            <div class="user-info">
+                <div class="user-display">
+                    <i class="fas fa-user"></i>
+                    <span id="username-display">Guest</span>
+                </div>
+                <button id="signup-btn" class="btn-outline">Sign Up</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="container">
+        <!-- Welcome / Signup Screen -->
+        <section id="welcome-screen" class="screen active">
+            <div class="welcome-content">
+                <div class="hero">
+                    <h2 class="animate-text">Test Your Coding Knowledge</h2>
+                    <p class="subtitle">Interactive quizzes for HTML, CSS & JavaScript learners</p>
+                    
+                    <div class="features">
+                        <div class="feature">
+                            <i class="fas fa-tachometer-alt"></i>
+                            <h3>Track Progress</h3>
+                            <p>Save scores and monitor improvement</p>
+                        </div>
+                        <div class="feature">
+                            <i class="fas fa-gamepad"></i>
+                            <h3>Interactive Learning</h3>
+                            <p>Learn through engaging quizzes</p>
+                        </div>
+                        <div class="feature">
+                            <i class="fas fa-chart-line"></i>
+                            <h3>Performance Analytics</h3>
+                            <p>Detailed feedback on strengths & weaknesses</p>
+                        </div>
+                    </div>
+                    
+                    <div class="welcome-actions">
+                        <div class="user-form">
+                            <h3>Enter Your Username</h3>
+                            <div class="form-group">
+                                <input type="text" id="username-input" placeholder="Enter your username">
+                                <button id="start-quiz-btn" class="btn-primary">Start Quiz</button>
+                            </div>
+                            <p class="note">Your scores will be saved with this username</p>
+                        </div>
+                        
+                        <div class="language-selector">
+                            <h3>Choose Quiz Language</h3>
+                            <div class="language-options">
+                                <button class="lang-btn active" data-language="html">HTML</button>
+                                <button class="lang-btn" data-language="css">CSS</button>
+                                <button class="lang-btn" data-language="js">JavaScript</button>
+                                <button class="lang-btn" data-language="all">All Mixed</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Quiz Screen -->
+        <section id="quiz-screen" class="screen">
+            <div class="quiz-header">
+                <div class="quiz-info">
+                    <div class="quiz-topic">
+                        <i class="fab fa-html5 html-icon"></i>
+                        <span id="quiz-topic">HTML Quiz</span>
+                    </div>
+                    <div class="quiz-stats">
+                        <div class="stat">
+                            <span class="stat-label">Question</span>
+                            <span id="question-counter">1/10</span>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-label">Score</span>
+                            <span id="score-display">0</span>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-label">Time</span>
+                            <span id="timer">60s</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="progress-container">
+                    <div class="progress-bar">
+                        <div id="progress" class="progress"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="quiz-content">
+                <div id="question-container">
+                    <h2 id="question-text">Question will appear here</h2>
+                </div>
+                
+                <div id="options-container">
+                    <!-- Options will be dynamically added here -->
+                </div>
+                
+                <div class="quiz-navigation">
+                    <button id="prev-btn" class="btn-outline" disabled>
+                        <i class="fas fa-arrow-left"></i> Previous
+                    </button>
+                    <button id="next-btn" class="btn-primary">
+                        Next <i class="fas fa-arrow-right"></i>
+                    </button>
+                    <button id="submit-btn" class="btn-submit">
+                        Submit Quiz <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Results Screen -->
+        <section id="results-screen" class="screen">
+            <div class="results-content">
+                <div class="results-header">
+                    <h2 class="results-title">Quiz Completed!</h2>
+                    <div class="score-circle">
+                        <svg width="120" height="120" viewBox="0 0 120 120">
+                            <circle class="score-circle-bg" cx="60" cy="60" r="54" stroke-width="12"></circle>
+                            <circle class="score-circle-progress" cx="60" cy="60" r="54" stroke-width="12" 
+                                    stroke-dasharray="339.292" stroke-dashoffset="339.292"></circle>
+                        </svg>
+                        <div class="score-text">
+                            <span id="final-score">0</span>
+                            <small>points</small>
+                        </div>
+                    </div>
+                    <p id="results-message">Great job!</p>
+                </div>
+                
+                <div class="results-details">
+                    <div class="result-stat">
+                        <i class="fas fa-check-circle"></i>
+                        <div>
+                            <h3>Correct Answers</h3>
+                            <p id="correct-answers">0/10</p>
+                        </div>
+                    </div>
+                    <div class="result-stat">
+                        <i class="fas fa-clock"></i>
+                        <div>
+                            <h3>Time Used</h3>
+                            <p id="time-used">0s</p>
+                        </div>
+                    </div>
+                    <div class="result-stat">
+                        <i class="fas fa-trophy"></i>
+                        <div>
+                            <h3>Performance</h3>
+                            <p id="performance">Beginner</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="results-actions">
+                    <button id="retake-btn" class="btn-outline">
+                        <i class="fas fa-redo"></i> Retake Quiz
+                    </button>
+                    <button id="view-highscores-btn" class="btn-primary">
+                        <i class="fas fa-chart-bar"></i> View Highscores
+                    </button>
+                    <button id="new-quiz-btn" class="btn-submit">
+                        <i class="fas fa-plus"></i> New Quiz
+                    </button>
+                </div>
+                
+                <div class="highscores-section">
+                    <h3><i class="fas fa-crown"></i> Highscores</h3>
+                    <div id="highscores-list">
+                        <!-- Highscores will be dynamically added here -->
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Signup Modal -->
+    <div id="signup-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Create Your QALICODE Account</h2>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p>Create an account to save your progress, track highscores, and unlock advanced features!</p>
+                <form id="signup-form">
+                    <div class="form-group">
+                        <label for="fullname">Full Name</label>
+                        <input type="text" id="fullname" placeholder="Enter your full name">
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="email" id="email" placeholder="Enter your email">
+                    </div>
+                    <div class="form-group">
+                        <label for="modal-username">Username</label>
+                        <input type="text" id="modal-username" placeholder="Choose a username">
+                    </div>
+                    <button type="submit" class="btn-primary">Create Account</button>
+                </form>
+                <p class="modal-note">Already have an account? <a href="#" id="login-link">Log in</a></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <p>QALICODE &copy; 2025 - Interactive Coding Quiz Platform</p>
+            <p>Practice HTML, CSS & JavaScript through engaging quizzes</p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>

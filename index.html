@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>QALICODE - Interactive Coding Quiz</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -10,11 +10,11 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
 </head>
 <body class="dark-mode">
-    <!-- Theme Toggle -->
+    <!-- Theme Toggle - Fixed Position -->
     <div class="theme-toggle-container">
         <button id="theme-toggle" class="theme-toggle-btn">
             <i class="fas fa-moon"></i>
-            <span>Dark Mode</span>
+            <span class="theme-text">Dark Mode</span>
         </button>
     </div>
 
@@ -53,20 +53,22 @@
                         <span class="user-status" id="user-status">Guest Mode</span>
                     </div>
                 </div>
-                <button id="logout-btn" class="btn-neo logout-btn">
-                    <i class="fas fa-sign-out-alt"></i>
-                    <span class="btn-label">Logout</span>
-                </button>
-                <button id="signup-btn" class="btn-neo signup-btn">
-                    <i class="fas fa-user-plus"></i>
-                    <span class="btn-label">Sign Up</span>
-                </button>
+                <div class="header-buttons">
+                    <button id="logout-btn" class="btn-neo logout-btn">
+                        <i class="fas fa-sign-out-alt"></i>
+                        <span class="btn-label">Logout</span>
+                    </button>
+                    <button id="signup-btn" class="btn-neo signup-btn">
+                        <i class="fas fa-user-plus"></i>
+                        <span class="btn-label">Sign Up</span>
+                    </button>
+                </div>
             </div>
         </div>
     </header>
 
     <!-- Main Content -->
-    <main class="container">
+    <main class="container main-content">
         <!-- Welcome Screen -->
         <section id="welcome-screen" class="screen active">
             <div class="welcome-container">
@@ -76,17 +78,21 @@
                             <span class="badge-text">🚀 Interactive Learning</span>
                         </div>
                         <h1 class="hero-title animate__animated animate__fadeInDown">
-                            Master <span class="hero-gradient">Web Development</span><br>
-                            Through <span class="hero-highlight">Challenging Quizzes</span>
+                            Master <span class="hero-gradient">Web Development</span>
                         </h1>
-                        <p class="hero-subtitle animate__animated animate__fadeInUp animate__delay-1s">
+                        <h2 class="hero-subtitle animate__animated animate__fadeInUp animate__delay-1s">
+                            Through <span class="hero-highlight">Challenging Quizzes</span>
+                        </h2>
+                        <p class="hero-description">
                             Test your skills in HTML, CSS & JavaScript with our interactive quiz platform.<br>
                             Track progress, compete with others, and become a coding expert!
                         </p>
                         
                         <div class="hero-actions">
                             <div class="action-card neo-card">
-                                <i class="fas fa-rocket"></i>
+                                <div class="action-icon">
+                                    <i class="fas fa-rocket"></i>
+                                </div>
                                 <h3>Quick Start</h3>
                                 <p>Jump right into a quiz and test your skills instantly</p>
                                 <button id="quick-start-btn" class="btn-neo-primary btn-large">
@@ -95,7 +101,9 @@
                             </div>
                             
                             <div class="action-card neo-card">
-                                <i class="fas fa-user-graduate"></i>
+                                <div class="action-icon">
+                                    <i class="fas fa-user-graduate"></i>
+                                </div>
                                 <h3>Learn & Improve</h3>
                                 <p>Detailed explanations for every answer to help you learn</p>
                                 <button id="learn-more-btn" class="btn-neo-secondary btn-large">
@@ -267,16 +275,6 @@
                             </button>
                         </div>
                     </div>
-                    
-                    <div class="leaderboard-preview">
-                        <div class="section-header">
-                            <h3><i class="fas fa-crown"></i> Today's Top Performers</h3>
-                            <a href="#" id="view-leaderboard" class="view-all">View All →</a>
-                        </div>
-                        <div class="leaderboard-list">
-                            <!-- Leaderboard will be populated by JS -->
-                        </div>
-                    </div>
                 </div>
             </div>
         </section>
@@ -292,10 +290,10 @@
                         </div>
                         <div class="quiz-controls">
                             <button id="pause-quiz" class="btn-neo-small">
-                                <i class="fas fa-pause"></i> Pause
+                                <i class="fas fa-pause"></i> <span class="btn-text">Pause</span>
                             </button>
                             <button id="quiz-help" class="btn-neo-small">
-                                <i class="fas fa-question-circle"></i> Help
+                                <i class="fas fa-question-circle"></i> <span class="btn-text">Help</span>
                             </button>
                         </div>
                     </div>
@@ -303,22 +301,28 @@
                     <div class="quiz-progress">
                         <div class="progress-stats">
                             <div class="progress-stat">
-                                <i class="fas fa-question-circle"></i>
-                                <div>
+                                <div class="stat-icon">
+                                    <i class="fas fa-question-circle"></i>
+                                </div>
+                                <div class="stat-content">
                                     <div class="stat-label">Question</div>
                                     <div class="stat-value" id="question-counter">1/10</div>
                                 </div>
                             </div>
                             <div class="progress-stat">
-                                <i class="fas fa-star"></i>
-                                <div>
+                                <div class="stat-icon">
+                                    <i class="fas fa-star"></i>
+                                </div>
+                                <div class="stat-content">
                                     <div class="stat-label">Score</div>
                                     <div class="stat-value" id="score-display">0</div>
                                 </div>
                             </div>
                             <div class="progress-stat">
-                                <i class="fas fa-clock"></i>
-                                <div>
+                                <div class="stat-icon">
+                                    <i class="fas fa-clock"></i>
+                                </div>
+                                <div class="stat-content">
                                     <div class="stat-label">Time</div>
                                     <div class="stat-value" id="timer">60s</div>
                                 </div>
@@ -367,18 +371,18 @@
                     
                     <div class="quiz-navigation-neo">
                         <button id="prev-btn" class="btn-neo-secondary btn-large nav-btn">
-                            <i class="fas fa-arrow-left"></i> Previous Question
+                            <i class="fas fa-arrow-left"></i> <span class="btn-text">Previous</span>
                         </button>
                         <div class="navigation-center">
                             <button id="review-btn" class="btn-neo-outline btn-medium">
-                                <i class="fas fa-eye"></i> Review
+                                <i class="fas fa-eye"></i> <span class="btn-text">Review</span>
                             </button>
                             <button id="next-btn" class="btn-neo-primary btn-large nav-btn">
-                                Next Question <i class="fas fa-arrow-right"></i>
+                                <span class="btn-text">Next</span> <i class="fas fa-arrow-right"></i>
                             </button>
                         </div>
                         <button id="submit-btn" class="btn-neo-success btn-large submit-btn">
-                            Submit Quiz <i class="fas fa-paper-plane"></i>
+                            <span class="btn-text">Submit Quiz</span> <i class="fas fa-paper-plane"></i>
                         </button>
                     </div>
                 </div>
@@ -405,9 +409,9 @@
                     <div class="score-display-neo">
                         <div class="score-circle-neo">
                             <div class="score-ring">
-                                <svg width="220" height="220">
-                                    <circle class="ring-background" cx="110" cy="110" r="100"></circle>
-                                    <circle class="ring-progress" cx="110" cy="110" r="100"></circle>
+                                <svg width="200" height="200">
+                                    <circle class="ring-background" cx="100" cy="100" r="90"></circle>
+                                    <circle class="ring-progress" cx="100" cy="100" r="90"></circle>
                                 </svg>
                             </div>
                             <div class="score-content">
@@ -437,21 +441,21 @@
                 <div class="results-actions-neo">
                     <div class="action-group">
                         <button id="retake-btn" class="btn-neo-secondary btn-large">
-                            <i class="fas fa-redo"></i> Retake Quiz
+                            <i class="fas fa-redo"></i> <span class="btn-text">Retake Quiz</span>
                         </button>
                         <button id="new-quiz-btn" class="btn-neo-primary btn-large">
-                            <i class="fas fa-plus-circle"></i> New Quiz
+                            <i class="fas fa-plus-circle"></i> <span class="btn-text">New Quiz</span>
                         </button>
                         <button id="share-btn" class="btn-neo-success btn-large">
-                            <i class="fas fa-share-alt"></i> Share Score
+                            <i class="fas fa-share-alt"></i> <span class="btn-text">Share Score</span>
                         </button>
                     </div>
                     <div class="action-group">
                         <button id="view-analysis-btn" class="btn-neo-outline btn-medium">
-                            <i class="fas fa-chart-bar"></i> View Analysis
+                            <i class="fas fa-chart-bar"></i> <span class="btn-text">View Analysis</span>
                         </button>
                         <button id="save-results-btn" class="btn-neo-outline btn-medium">
-                            <i class="fas fa-save"></i> Save Results
+                            <i class="fas fa-save"></i> <span class="btn-text">Save Results</span>
                         </button>
                     </div>
                 </div>
@@ -461,10 +465,10 @@
                         <h2><i class="fas fa-crown"></i> Your Highscores</h2>
                         <div class="section-actions">
                             <button id="export-highscores" class="btn-neo-small">
-                                <i class="fas fa-download"></i> Export
+                                <i class="fas fa-download"></i> <span class="btn-text">Export</span>
                             </button>
                             <button id="clear-highscores-btn" class="btn-neo-small danger-btn">
-                                <i class="fas fa-trash"></i> Clear All
+                                <i class="fas fa-trash"></i> <span class="btn-text">Clear All</span>
                             </button>
                         </div>
                     </div>

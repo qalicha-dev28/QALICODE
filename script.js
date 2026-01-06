@@ -1,4 +1,4 @@
-// Enhanced QALICODE Quiz Application - Fully Responsive
+// QALICODE - Enhanced Quiz Application
 
 // DOM Elements
 const screens = {
@@ -8,45 +8,36 @@ const screens = {
 };
 
 const buttons = {
-    startQuiz: document.getElementById('start-quiz-btn'),
-    quickStart: document.getElementById('quick-start-btn'),
-    login: document.getElementById('login-btn'),
-    demo: document.getElementById('demo-btn'),
+    getStarted: document.getElementById('get-started-btn'),
+    demoBtn: document.getElementById('demo-btn'),
+    loginHeader: document.getElementById('login-btn-header'),
+    logout: document.getElementById('logout-btn'),
     prev: document.getElementById('prev-btn'),
     next: document.getElementById('next-btn'),
     submit: document.getElementById('submit-btn'),
     retake: document.getElementById('retake-btn'),
     newQuiz: document.getElementById('new-quiz-btn'),
     share: document.getElementById('share-btn'),
-    signup: document.getElementById('signup-btn'),
-    logout: document.getElementById('logout-btn'),
-    hint: document.getElementById('hint-btn'),
-    skip: document.getElementById('skip-btn'),
-    flag: document.getElementById('flag-btn'),
-    themeToggle: document.getElementById('theme-toggle'),
-    messageOk: document.getElementById('message-ok-btn'),
-    messageCancel: document.getElementById('message-cancel-btn'),
-    confirmYes: document.getElementById('confirm-yes-btn'),
-    confirmNo: document.getElementById('confirm-no-btn'),
-    clearHighscores: document.getElementById('clear-highscores-btn'),
     viewAnalysis: document.getElementById('view-analysis-btn'),
     saveResults: document.getElementById('save-results-btn'),
     exportHighscores: document.getElementById('export-highscores'),
     pauseQuiz: document.getElementById('pause-quiz'),
     quizHelp: document.getElementById('quiz-help'),
-    review: document.getElementById('review-btn'),
-    learnMore: document.getElementById('learn-more-btn')
+    hint: document.getElementById('hint-btn'),
+    flag: document.getElementById('flag-btn'),
+    messageOk: document.getElementById('message-ok-btn'),
+    confirmYes: document.getElementById('confirm-yes-btn'),
+    confirmNo: document.getElementById('confirm-no-btn')
 };
 
 const inputs = {
-    username: document.getElementById('username-input'),
-    password: document.getElementById('password-input'),
-    modalUsername: document.getElementById('modal-username'),
-    modalPassword: document.getElementById('modal-password'),
-    fullname: document.getElementById('fullname'),
-    email: document.getElementById('email'),
     loginUsername: document.getElementById('login-username'),
-    loginPassword: document.getElementById('login-password')
+    loginPassword: document.getElementById('login-password'),
+    signupUsername: document.getElementById('signup-username'),
+    signupEmail: document.getElementById('signup-email'),
+    signupPassword: document.getElementById('signup-password'),
+    confirmPassword: document.getElementById('confirm-password'),
+    recoverEmail: document.getElementById('recover-email')
 };
 
 const displays = {
@@ -64,20 +55,18 @@ const displays = {
     correctAnswers: document.getElementById('correct-answers'),
     timeUsed: document.getElementById('time-used'),
     performance: document.getElementById('performance'),
-    quizLanguage: document.getElementById('quiz-language'),
     scoreRank: document.getElementById('score-rank'),
     resultsSubtitle: document.getElementById('results-subtitle'),
     highscoresTable: document.getElementById('highscores-table'),
     highscoreCount: document.getElementById('highscore-count'),
-    totalUsers: document.getElementById('total-users'),
     totalQuizzes: document.getElementById('total-quizzes'),
-    footerUserCount: document.getElementById('footer-user-count'),
-    footerQuizCount: document.getElementById('footer-quiz-count')
+    footerQuizCount: document.getElementById('footer-quiz-count'),
+    passwordStrengthBar: document.getElementById('password-strength-bar'),
+    passwordStrengthText: document.getElementById('password-strength-text')
 };
 
 const modals = {
-    signup: document.getElementById('signup-modal'),
-    login: document.getElementById('login-modal'),
+    auth: document.getElementById('auth-modal'),
     message: document.getElementById('message-modal'),
     confirm: document.getElementById('confirm-modal')
 };
@@ -94,15 +83,12 @@ const confirmElements = {
     text: document.getElementById('confirm-text')
 };
 
-const languageCards = document.querySelectorAll('.language-card');
-const languageSelectBtns = document.querySelectorAll('.language-select-btn');
-
 // Quiz State
 let quizState = {
     currentScreen: 'welcome',
     username: 'Guest',
     isLoggedIn: false,
-    selectedLanguage: 'html',
+    selectedLanguage: null,
     questions: [],
     currentQuestionIndex: 0,
     score: 0,
@@ -111,16 +97,14 @@ let quizState = {
     userAnswers: [],
     quizStarted: false,
     hintsUsed: 0,
-    questionsSkipped: 0,
     flaggedQuestions: new Set(),
     isPaused: false,
-    quizStartTime: null,
-    currentTheme: 'dark'
+    quizStartTime: null
 };
 
 // User System
-const users = JSON.parse(localStorage.getItem('qalicode-users')) || [
-    { username: 'demo', password: 'demo123', fullname: 'Demo User', email: 'demo@qalicode.com' }
+let users = JSON.parse(localStorage.getItem('qalicode-users')) || [
+    { username: 'demo', password: 'Demo@123', email: 'demo@qalicode.com', createdAt: new Date().toISOString() }
 ];
 
 // Enhanced Questions Database
@@ -137,7 +121,6 @@ const questionsDatabase = {
             correctAnswer: 0,
             explanation: "HTML stands for Hyper Text Markup Language, the standard markup language for creating web pages and web applications.",
             difficulty: "beginner",
-            category: "basics",
             points: 10
         },
         {
@@ -146,7 +129,6 @@ const questionsDatabase = {
             correctAnswer: 0,
             explanation: "The &lt;main&gt; element represents the dominant content of the &lt;body&gt; of a document.",
             difficulty: "beginner",
-            category: "semantics",
             points: 10
         },
         {
@@ -160,7 +142,6 @@ const questionsDatabase = {
             correctAnswer: 2,
             explanation: "The &lt;img&gt; tag uses the 'src' attribute to specify the image source and 'alt' for alternative text.",
             difficulty: "beginner",
-            category: "multimedia",
             points: 10
         },
         {
@@ -169,7 +150,6 @@ const questionsDatabase = {
             correctAnswer: 1,
             explanation: "The 'id' attribute provides a unique identifier for an HTML element, while 'class' can be used for multiple elements.",
             difficulty: "intermediate",
-            category: "attributes",
             points: 15
         },
         {
@@ -183,7 +163,6 @@ const questionsDatabase = {
             correctAnswer: 0,
             explanation: "It specifies the character encoding for the HTML document. UTF-8 supports all Unicode characters.",
             difficulty: "intermediate",
-            category: "metadata",
             points: 15
         }
     ],
@@ -199,7 +178,6 @@ const questionsDatabase = {
             correctAnswer: 1,
             explanation: "CSS stands for Cascading Style Sheets, used to describe the presentation of a document written in HTML.",
             difficulty: "beginner",
-            category: "basics",
             points: 10
         },
         {
@@ -208,7 +186,6 @@ const questionsDatabase = {
             correctAnswer: 2,
             explanation: "The 'font-size' property controls the size of text in CSS. It can be set using various units like px, em, rem, or percentages.",
             difficulty: "beginner",
-            category: "typography",
             points: 10
         },
         {
@@ -222,7 +199,6 @@ const questionsDatabase = {
             correctAnswer: 0,
             explanation: "The 'list-style-type: none' property removes bullet points from lists.",
             difficulty: "beginner",
-            category: "lists",
             points: 10
         },
         {
@@ -236,16 +212,14 @@ const questionsDatabase = {
             correctAnswer: 0,
             explanation: "The CSS Box Model consists of margin (outermost), border, padding, and content (innermost).",
             difficulty: "intermediate",
-            category: "layout",
             points: 15
         },
         {
             question: "Which CSS property is used to create rounded corners?",
             options: ["border-round", "corner-radius", "border-radius", "round-corner"],
             correctAnswer: 2,
-            explanation: "The 'border-radius' property is used to create rounded corners. You can specify one value for all corners or different values for each corner.",
+            explanation: "The 'border-radius' property is used to create rounded corners.",
             difficulty: "intermediate",
-            category: "effects",
             points: 15
         }
     ],
@@ -256,7 +230,6 @@ const questionsDatabase = {
             correctAnswer: 3,
             explanation: "JavaScript has several data types including Number, String, Boolean, Object, Array, Function, Undefined, and Null.",
             difficulty: "beginner",
-            category: "basics",
             points: 10
         },
         {
@@ -270,7 +243,6 @@ const questionsDatabase = {
             correctAnswer: 0,
             explanation: "The alert() function displays an alert box with a specified message and an OK button.",
             difficulty: "beginner",
-            category: "functions",
             points: 10
         },
         {
@@ -284,16 +256,14 @@ const questionsDatabase = {
             correctAnswer: 0,
             explanation: "Functions in JavaScript are declared using the 'function' keyword followed by the function name and parentheses.",
             difficulty: "beginner",
-            category: "functions",
             points: 10
         },
         {
             question: "What will 'console.log(typeof null)' output?",
             options: ["null", "undefined", "object", "string"],
             correctAnswer: 2,
-            explanation: "In JavaScript, typeof null returns 'object'. This is considered a historical bug in the language that cannot be fixed without breaking existing code.",
+            explanation: "In JavaScript, typeof null returns 'object'. This is considered a historical bug in the language.",
             difficulty: "advanced",
-            category: "types",
             points: 20
         },
         {
@@ -302,7 +272,6 @@ const questionsDatabase = {
             correctAnswer: 0,
             explanation: "The push() method adds one or more elements to the end of an array and returns the new length of the array.",
             difficulty: "intermediate",
-            category: "arrays",
             points: 15
         }
     ]
@@ -313,13 +282,10 @@ let highscores = JSON.parse(localStorage.getItem('qalicode-highscores')) || [];
 
 // Initialize App
 function initApp() {
-    console.log("🚀 Initializing Enhanced QALICODE Quiz App...");
+    console.log("🚀 Initializing QALICODE Quiz App...");
     
     // Create particle background
     createParticles();
-    
-    // Setup theme
-    setupTheme();
     
     // Check for saved user session
     const savedUser = localStorage.getItem('qalicode-current-user');
@@ -337,9 +303,6 @@ function initApp() {
     // Setup event listeners
     setupEventListeners();
     
-    // Initialize language selection
-    initLanguageSelection();
-    
     // Update statistics
     updateStatistics();
     
@@ -350,35 +313,6 @@ function initApp() {
     switchScreen('welcome');
 }
 
-// Setup theme
-function setupTheme() {
-    const savedTheme = localStorage.getItem('qalicode-theme') || 'dark';
-    quizState.currentTheme = savedTheme;
-    
-    if (savedTheme === 'light') {
-        document.body.classList.add('light-mode');
-        buttons.themeToggle.innerHTML = '<i class="fas fa-sun"></i><span class="theme-text">Light Mode</span>';
-    } else {
-        document.body.classList.remove('light-mode');
-        buttons.themeToggle.innerHTML = '<i class="fas fa-moon"></i><span class="theme-text">Dark Mode</span>';
-    }
-}
-
-// Toggle theme
-function toggleTheme() {
-    if (quizState.currentTheme === 'dark') {
-        quizState.currentTheme = 'light';
-        document.body.classList.add('light-mode');
-        localStorage.setItem('qalicode-theme', 'light');
-        buttons.themeToggle.innerHTML = '<i class="fas fa-sun"></i><span class="theme-text">Light Mode</span>';
-    } else {
-        quizState.currentTheme = 'dark';
-        document.body.classList.remove('light-mode');
-        localStorage.setItem('qalicode-theme', 'dark');
-        buttons.themeToggle.innerHTML = '<i class="fas fa-moon"></i><span class="theme-text">Dark Mode</span>';
-    }
-}
-
 // Create particle background
 function createParticles() {
     const particlesContainer = document.getElementById('particles');
@@ -387,7 +321,6 @@ function createParticles() {
     for (let i = 0; i < particleCount; i++) {
         const particle = document.createElement('div');
         
-        // Random properties
         const size = Math.random() * 4 + 1;
         const posX = Math.random() * 100;
         const posY = Math.random() * 100;
@@ -395,7 +328,6 @@ function createParticles() {
         const delay = Math.random() * 5;
         const color = `hsl(${Math.random() * 360}, 70%, 60%)`;
         
-        // Apply styles
         particle.style.cssText = `
             position: absolute;
             width: ${size}px;
@@ -412,7 +344,6 @@ function createParticles() {
         particlesContainer.appendChild(particle);
     }
     
-    // Add CSS for particle animation
     const style = document.createElement('style');
     style.textContent = `
         @keyframes floatParticle {
@@ -437,15 +368,13 @@ function createParticles() {
 function setupEventListeners() {
     console.log("🔧 Setting up event listeners...");
     
-    // Theme toggle
-    buttons.themeToggle.addEventListener('click', toggleTheme);
+    // Navigation buttons
+    buttons.getStarted.addEventListener('click', showAuthModal);
+    buttons.demoBtn.addEventListener('click', tryDemo);
+    buttons.loginHeader.addEventListener('click', showAuthModal);
+    buttons.logout.addEventListener('click', logoutUser);
     
     // Quiz buttons
-    buttons.startQuiz.addEventListener('click', startQuiz);
-    buttons.quickStart.addEventListener('click', quickStart);
-    buttons.login.addEventListener('click', openLoginModal);
-    buttons.demo.addEventListener('click', tryDemo);
-    buttons.learnMore.addEventListener('click', showLearnMore);
     buttons.prev.addEventListener('click', showPreviousQuestion);
     buttons.next.addEventListener('click', showNextQuestion);
     buttons.submit.addEventListener('click', submitQuiz);
@@ -458,62 +387,58 @@ function setupEventListeners() {
     buttons.saveResults.addEventListener('click', saveResults);
     buttons.exportHighscores.addEventListener('click', exportHighscores);
     
-    // Auth buttons
-    buttons.signup.addEventListener('click', openSignupModal);
-    buttons.logout.addEventListener('click', () => showConfirmModal(
-        'Logout',
-        'Are you sure you want to logout?',
-        logoutUser
-    ));
-    
     // Quiz control buttons
     buttons.hint.addEventListener('click', showHint);
-    buttons.skip.addEventListener('click', skipQuestion);
     buttons.flag.addEventListener('click', toggleFlag);
     buttons.pauseQuiz.addEventListener('click', togglePause);
     buttons.quizHelp.addEventListener('click', showQuizHelp);
-    buttons.review.addEventListener('click', showReview);
     
     // Modal events
     document.querySelectorAll('.close-modal-neo').forEach(btn => {
         btn.addEventListener('click', closeAllModals);
     });
     
-    document.getElementById('signup-form').addEventListener('submit', handleSignupSubmit);
+    // Auth form submissions
     document.getElementById('login-form').addEventListener('submit', handleLoginSubmit);
+    document.getElementById('signup-form').addEventListener('submit', handleSignupSubmit);
+    document.getElementById('recover-form').addEventListener('submit', handleRecoverSubmit);
     
-    // Modal navigation
-    document.getElementById('switch-to-login').addEventListener('click', (e) => {
-        e.preventDefault();
-        closeModal('signup');
-        openLoginModal();
+    // Auth tabs
+    document.querySelectorAll('.auth-tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+            const tabName = tab.dataset.tab;
+            switchAuthTab(tabName);
+        });
     });
     
-    document.getElementById('switch-to-signup').addEventListener('click', (e) => {
-        e.preventDefault();
-        closeModal('login');
-        openSignupModal();
+    // Password strength checker
+    inputs.signupPassword?.addEventListener('input', checkPasswordStrength);
+    inputs.confirmPassword?.addEventListener('input', checkPasswordMatch);
+    
+    // Language selection
+    document.querySelectorAll('.language-start-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const language = btn.dataset.language;
+            selectLanguage(language);
+        });
+    });
+    
+    document.querySelectorAll('.language-card-simple').forEach(card => {
+        card.addEventListener('click', (e) => {
+            if (!e.target.closest('.language-start-btn')) {
+                const language = card.dataset.language;
+                selectLanguage(language);
+            }
+        });
     });
     
     // Message modal buttons
     buttons.messageOk.addEventListener('click', () => closeModal('message'));
-    buttons.messageCancel.addEventListener('click', () => closeModal('message'));
     
     // Confirm modal buttons
     buttons.confirmYes.addEventListener('click', handleConfirmYes);
     buttons.confirmNo.addEventListener('click', () => closeModal('confirm'));
-    
-    // Highscores actions
-    buttons.clearHighscores.addEventListener('click', () => showConfirmModal(
-        'Clear All Highscores',
-        'Are you sure you want to clear ALL highscores? This action cannot be undone.',
-        clearHighscores
-    ));
-    
-    // Enter key for username
-    inputs.username.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') startQuiz();
-    });
     
     // Close modal on outside click
     window.addEventListener('click', (e) => {
@@ -522,65 +447,107 @@ function setupEventListeners() {
         }
     });
     
-    // Window resize handler
-    window.addEventListener('resize', handleResize);
-}
-
-// Handle window resize
-function handleResize() {
-    // Update highscore table for mobile/desktop
-    updateHighscoresDisplay();
-    
-    // Update button text visibility for mobile
-    const isMobile = window.innerWidth < 480;
-    document.querySelectorAll('.btn-text').forEach(span => {
-        if (isMobile && span.closest('.question-actions')) {
-            span.style.display = 'none';
-        } else {
-            span.style.display = 'inline';
+    // Enter key for login
+    inputs.loginPassword?.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            document.getElementById('login-form').requestSubmit();
         }
     });
 }
 
-// Initialize language selection
-function initLanguageSelection() {
-    languageCards.forEach(card => {
-        card.addEventListener('click', () => {
-            selectLanguage(card.dataset.language);
-        });
+// Switch auth tab
+function switchAuthTab(tabName) {
+    // Update tabs
+    document.querySelectorAll('.auth-tab').forEach(tab => {
+        tab.classList.toggle('active', tab.dataset.tab === tabName);
     });
     
-    languageSelectBtns.forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            selectLanguage(btn.dataset.language);
-            startQuiz();
-        });
+    // Update forms
+    document.querySelectorAll('.auth-form').forEach(form => {
+        form.classList.toggle('active', form.dataset.form === tabName);
     });
 }
 
-// Select language
-function selectLanguage(language) {
-    // Remove active class from all cards
-    languageCards.forEach(c => c.classList.remove('active'));
+// Check password strength
+function checkPasswordStrength() {
+    const password = inputs.signupPassword.value;
+    let strength = 0;
     
-    // Add active class to selected card
-    const selectedCard = document.querySelector(`[data-language="${language}"]`);
-    if (selectedCard) {
-        selectedCard.classList.add('active');
+    // Check length
+    if (password.length >= 8) strength += 20;
+    
+    // Check for uppercase
+    if (/[A-Z]/.test(password)) strength += 20;
+    
+    // Check for lowercase
+    if (/[a-z]/.test(password)) strength += 20;
+    
+    // Check for numbers
+    if (/[0-9]/.test(password)) strength += 20;
+    
+    // Check for special characters
+    if (/[^A-Za-z0-9]/.test(password)) strength += 20;
+    
+    // Update strength bar
+    displays.passwordStrengthBar.style.width = `${strength}%`;
+    
+    // Update strength text and color
+    let strengthText = '';
+    let color = '';
+    
+    if (strength <= 40) {
+        strengthText = 'Weak';
+        color = '#FF6584';
+    } else if (strength <= 80) {
+        strengthText = 'Good';
+        color = '#FFCC00';
+    } else {
+        strengthText = 'Strong';
+        color = '#4CD964';
     }
     
-    // Update selected language
-    quizState.selectedLanguage = language;
+    displays.passwordStrengthText.textContent = strengthText;
+    displays.passwordStrengthBar.style.background = color;
     
-    console.log(`📚 Language selected: ${language}`);
+    // Update requirement checks
+    updatePasswordRequirements(password);
+}
+
+// Update password requirements
+function updatePasswordRequirements(password) {
+    const requirements = {
+        length: password.length >= 8,
+        uppercase: /[A-Z]/.test(password),
+        lowercase: /[a-z]/.test(password),
+        number: /[0-9]/.test(password),
+        special: /[^A-Za-z0-9]/.test(password)
+    };
     
-    // Animate selection
-    if (selectedCard) {
-        selectedCard.style.transform = 'scale(0.95)';
-        setTimeout(() => {
-            selectedCard.style.transform = 'scale(1)';
-        }, 150);
+    for (const [key, isValid] of Object.entries(requirements)) {
+        const element = document.getElementById(`req-${key}`);
+        if (element) {
+            element.classList.toggle('valid', isValid);
+        }
+    }
+}
+
+// Check password match
+function checkPasswordMatch() {
+    const password = inputs.signupPassword.value;
+    const confirm = inputs.confirmPassword.value;
+    const feedback = document.getElementById('confirm-feedback');
+    
+    if (!confirm) {
+        feedback.textContent = '';
+        return;
+    }
+    
+    if (password === confirm) {
+        feedback.textContent = '✓ Passwords match';
+        feedback.style.color = '#4CD964';
+    } else {
+        feedback.textContent = '✗ Passwords do not match';
+        feedback.style.color = '#FF6584';
     }
 }
 
@@ -590,24 +557,19 @@ function updateUserDisplay() {
     
     if (quizState.isLoggedIn) {
         displays.userStatus.textContent = 'Logged In';
-        displays.userStatus.style.color = 'var(--accent-success)';
+        displays.userStatus.style.color = '#4CD964';
         buttons.logout.style.display = 'flex';
-        buttons.signup.style.display = 'none';
+        buttons.loginHeader.style.display = 'none';
     } else {
         displays.userStatus.textContent = 'Guest Mode';
-        displays.userStatus.style.color = 'var(--accent-warning)';
+        displays.userStatus.style.color = '#FFCC00';
         buttons.logout.style.display = 'none';
-        buttons.signup.style.display = 'flex';
+        buttons.loginHeader.style.display = 'flex';
     }
 }
 
 // Update statistics
 function updateStatistics() {
-    // Update total users count
-    const totalUsers = users.length + Math.floor(Math.random() * 1000) + 1000;
-    displays.totalUsers.textContent = `${totalUsers.toLocaleString()}+`;
-    displays.footerUserCount.textContent = `${totalUsers.toLocaleString()}+`;
-    
     // Update total quizzes count
     const totalQuizzes = highscores.length + Math.floor(Math.random() * 500) + 2000;
     displays.totalQuizzes.textContent = `${totalQuizzes.toLocaleString()}+`;
@@ -620,7 +582,7 @@ function loadHighscores() {
     updateHighscoresDisplay();
 }
 
-// Update highscores display - Responsive
+// Update highscores display
 function updateHighscoresDisplay() {
     const tableBody = displays.highscoresTable;
     tableBody.innerHTML = '';
@@ -630,17 +592,8 @@ function updateHighscoresDisplay() {
             <div class="no-highscores-message">
                 <i class="fas fa-trophy"></i>
                 <p>No highscores yet. Complete a quiz to see your scores here!</p>
-                <button id="start-from-highscores" class="btn-neo-primary btn-medium" style="margin-top: 20px;">
-                    <i class="fas fa-play"></i> Start Your First Quiz
-                </button>
             </div>
         `;
-        
-        // Add event listener to the new button
-        document.getElementById('start-from-highscores')?.addEventListener('click', () => {
-            switchScreen('welcome');
-        });
-        
         displays.highscoreCount.textContent = '0';
         return;
     }
@@ -648,13 +601,8 @@ function updateHighscoresDisplay() {
     // Sort by score (descending)
     const sortedHighscores = [...highscores].sort((a, b) => b.score - a.score);
     
-    // Check if we're on mobile
-    const isMobile = window.innerWidth < 992;
-    
-    // Display top 10 on mobile, top 20 on desktop
-    const displayCount = isMobile ? 10 : 20;
-    
-    sortedHighscores.slice(0, displayCount).forEach((highscore, index) => {
+    // Display top 10
+    sortedHighscores.slice(0, 10).forEach((highscore, index) => {
         const row = document.createElement('div');
         row.className = `highscore-row ${highscore.username === quizState.username ? 'current-user' : ''}`;
         
@@ -674,122 +622,21 @@ function updateHighscoresDisplay() {
                              highscore.language === 'css' ? 'css' :
                              highscore.language === 'js' ? 'js' : 'mixed';
         
-        // Create mobile or desktop view
-        if (isMobile) {
-            row.innerHTML = `
-                <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
-                    <div style="display: flex; align-items: center; gap: 15px;">
-                        <div class="rank-badge ${rankClass}">${rankText}</div>
-                        <div>
-                            <div class="username-cell" style="font-size: 1rem; margin-bottom: 5px;">${highscore.username}</div>
-                            <div class="language-badge ${languageClass}">
-                                <i class="fab fa-${highscore.language === 'html' ? 'html5' : highscore.language === 'css' ? 'css3-alt' : highscore.language === 'js' ? 'js' : 'random'}"></i>
-                                ${languageName}
-                            </div>
-                        </div>
-                    </div>
-                    <div style="text-align: right;">
-                        <div class="score-value-cell" style="font-size: 1.3rem;">${highscore.score}</div>
-                        <div class="date-cell" style="font-size: 0.8rem;">${highscore.date}</div>
-                    </div>
-                </div>
-                <div class="action-buttons" style="width: 100%; justify-content: center; margin-top: 10px;">
-                    <button class="btn-neo-small delete-highscore" data-id="${highscore.timestamp}" title="Delete">
-                        <i class="fas fa-trash"></i> Delete
-                    </button>
-                    ${highscore.username === quizState.username ? `
-                        <button class="btn-neo-small share-highscore" data-id="${highscore.timestamp}" title="Share">
-                            <i class="fas fa-share-alt"></i> Share
-                        </button>
-                    ` : ''}
-                </div>
-            `;
-        } else {
-            row.innerHTML = `
-                <div class="rank-badge ${rankClass}">${rankText}</div>
-                <div class="language-badge ${languageClass}">
-                    <i class="fab fa-${highscore.language === 'html' ? 'html5' : highscore.language === 'css' ? 'css3-alt' : highscore.language === 'js' ? 'js' : 'random'}"></i>
-                    ${languageName}
-                </div>
-                <div class="username-cell">${highscore.username}</div>
-                <div class="score-value-cell">${highscore.score}</div>
-                <div class="date-cell">${highscore.date}</div>
-                <div class="action-buttons">
-                    <button class="btn-neo-small delete-highscore" data-id="${highscore.timestamp}" title="Delete">
-                        <i class="fas fa-trash"></i>
-                    </button>
-                    ${highscore.username === quizState.username ? `
-                        <button class="btn-neo-small share-highscore" data-id="${highscore.timestamp}" title="Share">
-                            <i class="fas fa-share-alt"></i>
-                        </button>
-                    ` : ''}
-                </div>
-            `;
-        }
+        row.innerHTML = `
+            <div class="rank-badge ${rankClass}">${rankText}</div>
+            <div class="language-badge ${languageClass}">
+                <i class="fab fa-${highscore.language === 'html' ? 'html5' : highscore.language === 'css' ? 'css3-alt' : 'js'}"></i>
+                ${languageName}
+            </div>
+            <div class="username-cell">${highscore.username}</div>
+            <div class="score-value-cell">${highscore.score}</div>
+            <div class="date-cell">${highscore.date}</div>
+        `;
         
         tableBody.appendChild(row);
     });
     
-    // Add event listeners for action buttons
-    tableBody.querySelectorAll('.delete-highscore').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            const timestamp = parseInt(btn.dataset.id);
-            showConfirmModal(
-                'Delete Highscore',
-                'Are you sure you want to delete this highscore?',
-                () => deleteHighscore(timestamp)
-            );
-        });
-    });
-    
-    tableBody.querySelectorAll('.share-highscore').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            const timestamp = parseInt(btn.dataset.id);
-            shareHighscore(timestamp);
-        });
-    });
-    
-    // Update count
     displays.highscoreCount.textContent = highscores.length.toLocaleString();
-}
-
-// Delete a highscore
-function deleteHighscore(timestamp) {
-    highscores = highscores.filter(hs => hs.timestamp !== timestamp);
-    localStorage.setItem('qalicode-highscores', JSON.stringify(highscores));
-    updateHighscoresDisplay();
-    showMessage('Success', 'Highscore deleted successfully!', 'success');
-}
-
-// Clear all highscores
-function clearHighscores() {
-    highscores = [];
-    localStorage.setItem('qalicode-highscores', JSON.stringify(highscores));
-    updateHighscoresDisplay();
-    showMessage('Cleared', 'All highscores have been cleared.', 'info');
-}
-
-// Share a highscore
-function shareHighscore(timestamp) {
-    const highscore = highscores.find(hs => hs.timestamp === timestamp);
-    if (!highscore) return;
-    
-    const shareText = `I scored ${highscore.score} points in ${highscore.language.toUpperCase()} quiz on QALICODE! 🚀 Try to beat my score!`;
-    
-    if (navigator.share) {
-        navigator.share({
-            title: 'My QALICODE Score',
-            text: shareText,
-            url: window.location.href
-        }).catch(() => {
-            // Fallback to clipboard
-            copyToClipboard(shareText, 'Score copied to clipboard!');
-        });
-    } else {
-        copyToClipboard(shareText, 'Score copied to clipboard! Share it with your friends!');
-    }
 }
 
 // Export highscores
@@ -816,19 +663,11 @@ function exportHighscores() {
     showMessage('Exported', 'Highscores have been exported as CSV file.', 'success');
 }
 
-// Copy to clipboard
-function copyToClipboard(text, successMessage) {
-    navigator.clipboard.writeText(text)
-        .then(() => showMessage('Copied!', successMessage, 'success'))
-        .catch(() => showMessage('Error', 'Could not copy to clipboard.', 'error'));
-}
-
 // Modal functions
 function showMessage(title, text, type = 'info') {
     messageElements.title.textContent = title;
     messageElements.text.textContent = text;
     
-    // Set icon based on type
     const iconMap = {
         success: 'fas fa-check-circle',
         error: 'fas fa-exclamation-circle',
@@ -837,17 +676,14 @@ function showMessage(title, text, type = 'info') {
     };
     
     const colorMap = {
-        success: 'var(--accent-success)',
-        error: 'var(--accent-secondary)',
-        warning: 'var(--accent-warning)',
-        info: 'var(--accent-primary)'
+        success: '#4CD964',
+        error: '#FF6584',
+        warning: '#FFCC00',
+        info: '#6C63FF'
     };
     
     messageElements.icon.innerHTML = `<i class="${iconMap[type] || iconMap.info}"></i>`;
     messageElements.icon.style.color = colorMap[type] || colorMap.info;
-    
-    // Show/hide cancel button
-    buttons.messageCancel.style.display = type === 'warning' ? 'inline-flex' : 'none';
     
     openModal('message');
 }
@@ -856,11 +692,9 @@ function showConfirmModal(title, text, onConfirm) {
     confirmElements.title.textContent = title;
     confirmElements.text.textContent = text;
     confirmElements.icon.innerHTML = '<i class="fas fa-question-circle"></i>';
-    confirmElements.icon.style.color = 'var(--accent-warning)';
+    confirmElements.icon.style.color = '#FFCC00';
     
-    // Store the confirmation callback
     window.confirmCallback = onConfirm;
-    
     openModal('confirm');
 }
 
@@ -890,23 +724,37 @@ function closeAllModals() {
 }
 
 // Auth functions
-function openSignupModal() {
-    openModal('signup');
-    document.getElementById('signup-form').reset();
+function showAuthModal() {
+    switchAuthTab('login');
+    openModal('auth');
 }
 
-function openLoginModal() {
-    openModal('login');
-    document.getElementById('login-form').reset();
+function handleLoginSubmit(e) {
+    e.preventDefault();
+    
+    const usernameOrEmail = inputs.loginUsername.value.trim();
+    const password = inputs.loginPassword.value.trim();
+    
+    if (!usernameOrEmail || !password) {
+        showMessage('Missing Information', 'Please enter both username/email and password.', 'error');
+        return;
+    }
+    
+    // Try to login
+    if (loginUser(usernameOrEmail, password)) {
+        closeModal('auth');
+    } else {
+        showMessage('Login Failed', 'Invalid username/email or password. Please try again.', 'error');
+    }
 }
 
 function handleSignupSubmit(e) {
     e.preventDefault();
     
-    const fullname = inputs.fullname.value.trim();
-    const email = inputs.email.value.trim();
-    const username = inputs.modalUsername.value.trim();
-    const password = inputs.modalPassword.value.trim();
+    const username = inputs.signupUsername.value.trim();
+    const email = inputs.signupEmail.value.trim();
+    const password = inputs.signupPassword.value.trim();
+    const confirm = inputs.confirmPassword.value.trim();
     
     // Validation
     if (username.length < 3) {
@@ -919,8 +767,8 @@ function handleSignupSubmit(e) {
         return;
     }
     
-    if (password.length < 6) {
-        showMessage('Weak Password', 'Password must be at least 6 characters long.', 'error');
+    if (users.find(u => u.email === email)) {
+        showMessage('Email Taken', 'This email is already registered. Please use another email or login.', 'error');
         return;
     }
     
@@ -929,12 +777,23 @@ function handleSignupSubmit(e) {
         return;
     }
     
+    // Check password strength
+    const passwordStrength = checkPasswordComplexity(password);
+    if (passwordStrength < 80) {
+        showMessage('Weak Password', 'Please use a stronger password that meets all requirements.', 'error');
+        return;
+    }
+    
+    if (password !== confirm) {
+        showMessage('Password Mismatch', 'Passwords do not match. Please confirm your password.', 'error');
+        return;
+    }
+    
     // Create user
     const newUser = {
         username,
-        password,
-        fullname,
         email,
+        password,
         createdAt: new Date().toISOString(),
         lastLogin: new Date().toISOString()
     };
@@ -945,28 +804,50 @@ function handleSignupSubmit(e) {
     // Auto-login
     loginUser(username, password);
     
-    showMessage('Welcome!', `Account created successfully! Welcome to QALICODE, ${fullname || username}!`, 'success');
-    closeModal('signup');
+    showMessage('Welcome!', `Account created successfully! Welcome to QALICODE, ${username}!`, 'success');
+    closeModal('auth');
 }
 
-function handleLoginSubmit(e) {
+function checkPasswordComplexity(password) {
+    let strength = 0;
+    
+    if (password.length >= 8) strength += 20;
+    if (/[A-Z]/.test(password)) strength += 20;
+    if (/[a-z]/.test(password)) strength += 20;
+    if (/[0-9]/.test(password)) strength += 20;
+    if (/[^A-Za-z0-9]/.test(password)) strength += 20;
+    
+    return strength;
+}
+
+function handleRecoverSubmit(e) {
     e.preventDefault();
     
-    const username = inputs.loginUsername.value.trim();
-    const password = inputs.loginPassword.value.trim();
+    const email = inputs.recoverEmail.value.trim();
     
-    if (loginUser(username, password)) {
-        closeModal('login');
+    if (!email.includes('@') || !email.includes('.')) {
+        showMessage('Invalid Email', 'Please enter a valid email address.', 'error');
+        return;
+    }
+    
+    const user = users.find(u => u.email === email);
+    
+    if (user) {
+        showMessage('Recovery Email Sent', `A password reset link has been sent to ${email}. Please check your inbox.`, 'success');
+        closeModal('auth');
     } else {
-        showMessage('Login Failed', 'Invalid username or password. Please try again.', 'error');
+        showMessage('Email Not Found', 'No account found with this email address. Please check and try again.', 'error');
     }
 }
 
-function loginUser(username, password) {
-    const user = users.find(u => u.username === username && u.password === password);
+function loginUser(usernameOrEmail, password) {
+    const user = users.find(u => 
+        (u.username === usernameOrEmail || u.email === usernameOrEmail) && 
+        u.password === password
+    );
     
     if (user) {
-        quizState.username = username;
+        quizState.username = user.username;
         quizState.isLoggedIn = true;
         
         // Update user's last login
@@ -976,14 +857,12 @@ function loginUser(username, password) {
         // Save session
         localStorage.setItem('qalicode-current-user', JSON.stringify({
             username: user.username,
-            fullname: user.fullname,
             email: user.email
         }));
         
         updateUserDisplay();
-        inputs.username.value = username;
         
-        showMessage('Welcome Back!', `Great to see you again, ${user.fullname || username}!`, 'success');
+        showMessage('Welcome Back!', `Great to see you again, ${user.username}!`, 'success');
         return true;
     }
     
@@ -991,48 +870,44 @@ function loginUser(username, password) {
 }
 
 function logoutUser() {
-    quizState.username = 'Guest';
-    quizState.isLoggedIn = false;
-    
-    localStorage.removeItem('qalicode-current-user');
-    updateUserDisplay();
-    inputs.username.value = '';
-    
-    showMessage('Logged Out', 'You have been successfully logged out.', 'info');
-    
-    // Redirect to home screen
-    setTimeout(() => {
-        switchScreen('welcome');
-    }, 1000);
-}
-
-// Quick start function
-function quickStart() {
-    inputs.username.value = 'QuickPlayer' + Math.floor(Math.random() * 1000);
-    selectLanguage('html');
-    startQuiz();
+    showConfirmModal(
+        'Logout',
+        'Are you sure you want to logout?',
+        () => {
+            quizState.username = 'Guest';
+            quizState.isLoggedIn = false;
+            
+            localStorage.removeItem('qalicode-current-user');
+            updateUserDisplay();
+            
+            showMessage('Logged Out', 'You have been successfully logged out.', 'info');
+            switchScreen('welcome');
+        }
+    );
 }
 
 // Try demo function
 function tryDemo() {
-    inputs.username.value = 'DemoUser';
-    selectLanguage('all');
+    if (!quizState.isLoggedIn) {
+        showMessage('Login Required', 'Please login or create an account to try the demo.', 'info');
+        showAuthModal();
+        return;
+    }
+    
+    quizState.selectedLanguage = 'html';
     startQuiz();
 }
 
-// Show learn more
-function showLearnMore() {
-    showMessage('About QALICODE', 
-        'QALICODE is an interactive quiz platform designed to help you master web development through challenging quizzes. ' +
-        'Features include:\n\n' +
-        '• Three difficulty levels\n' +
-        '• Detailed explanations for every answer\n' +
-        '• Progress tracking\n' +
-        '• Highscores and leaderboards\n' +
-        '• Dark/Light mode\n\n' +
-        'Start your learning journey today!', 
-        'info'
-    );
+// Select language
+function selectLanguage(language) {
+    if (!quizState.isLoggedIn) {
+        showMessage('Login Required', 'Please login or create an account to start a quiz.', 'info');
+        showAuthModal();
+        return;
+    }
+    
+    quizState.selectedLanguage = language;
+    startQuiz();
 }
 
 // Screen management
@@ -1047,45 +922,18 @@ function switchScreen(screenName) {
         updateStatistics();
     }
     
-    // Close any open modals when switching screens
     closeAllModals();
 }
 
 // Start quiz
 function startQuiz() {
-    const username = inputs.username.value.trim();
-    const password = inputs.password.value.trim();
-    
-    // Username validation
-    if (!username) {
-        showMessage('Username Required', 'Please enter a username to start the quiz.', 'warning');
+    if (!quizState.selectedLanguage) {
+        showMessage('Language Required', 'Please select a quiz language first.', 'warning');
         return;
     }
     
-    // Handle login if password provided
-    if (password) {
-        if (!loginUser(username, password)) {
-            showMessage('Login Failed', 'Invalid credentials. Please try again or continue as guest.', 'error');
-            return;
-        }
-    } else {
-        // Guest mode
-        quizState.username = username;
-        quizState.isLoggedIn = false;
-        updateUserDisplay();
-    }
-    
-    // Get questions
-    if (quizState.selectedLanguage === 'all') {
-        quizState.questions = [
-            ...questionsDatabase.html.slice(0, 4),
-            ...questionsDatabase.css.slice(0, 3),
-            ...questionsDatabase.js.slice(0, 3)
-        ];
-        quizState.questions = shuffleArray(quizState.questions);
-    } else {
-        quizState.questions = [...questionsDatabase[quizState.selectedLanguage]];
-    }
+    // Get questions for selected language
+    quizState.questions = [...questionsDatabase[quizState.selectedLanguage]];
     
     // Reset state
     quizState.currentQuestionIndex = 0;
@@ -1093,7 +941,6 @@ function startQuiz() {
     quizState.userAnswers = new Array(quizState.questions.length).fill(null);
     quizState.quizStarted = true;
     quizState.hintsUsed = 0;
-    quizState.questionsSkipped = 0;
     quizState.flaggedQuestions.clear();
     quizState.isPaused = false;
     quizState.quizStartTime = Date.now();
@@ -1110,15 +957,11 @@ function setupQuiz() {
     displays.progressFill.style.width = '0%';
     displays.scoreDisplay.textContent = '0';
     displays.timer.textContent = '60s';
-    displays.timer.style.color = 'var(--text-primary)';
+    displays.timer.style.color = '#FFFFFF';
     
     buttons.prev.disabled = true;
-    buttons.next.disabled = true; // Start disabled until answer selected
-    buttons.submit.style.display = 'none'; // Hide initially
-    buttons.hint.style.display = 'flex';
-    buttons.skip.style.display = 'flex';
-    buttons.flag.style.display = 'flex';
-    buttons.pauseQuiz.innerHTML = '<i class="fas fa-pause"></i> <span class="btn-text">Pause</span>';
+    buttons.next.disabled = true;
+    buttons.submit.style.display = 'none';
     
     updateQuestionCounter();
     createProgressDots();
@@ -1129,22 +972,19 @@ function updateQuizHeader() {
     const languageNames = {
         html: 'HTML',
         css: 'CSS',
-        js: 'JavaScript',
-        all: 'Full Stack'
+        js: 'JavaScript'
     };
     
     const languageIcons = {
         html: 'fab fa-html5',
         css: 'fab fa-css3-alt',
-        js: 'fab fa-js',
-        all: 'fas fa-random'
+        js: 'fab fa-js'
     };
     
     const languageColors = {
-        html: 'var(--html-color)',
-        css: 'var(--css-color)',
-        js: 'var(--js-color)',
-        all: 'var(--mixed-color)'
+        html: '#E34F26',
+        css: '#1572B6',
+        js: '#F7DF1E'
     };
     
     displays.quizTopicBadge.innerHTML = `
@@ -1160,7 +1000,6 @@ function createProgressDots() {
     const dotsContainer = document.querySelector('.progress-dots');
     dotsContainer.innerHTML = '';
     
-    // Only show dots on larger screens
     if (window.innerWidth >= 768) {
         for (let i = 0; i < quizState.questions.length; i++) {
             const dot = document.createElement('div');
@@ -1177,19 +1016,6 @@ function updateProgressDots() {
     dots.forEach((dot, index) => {
         dot.classList.toggle('active', index === quizState.currentQuestionIndex);
     });
-}
-
-// Check if we should show submit button
-function checkSubmitButton() {
-    const isLastQuestion = quizState.currentQuestionIndex === quizState.questions.length - 1;
-    const hasAnswer = quizState.userAnswers[quizState.currentQuestionIndex] !== null;
-    
-    if (isLastQuestion && hasAnswer) {
-        buttons.submit.style.display = 'block';
-        buttons.submit.disabled = false;
-    } else {
-        buttons.submit.style.display = 'none';
-    }
 }
 
 // Display question
@@ -1220,7 +1046,6 @@ function displayQuestion() {
     });
     
     updateNavigationButtons();
-    checkSubmitButton();
     updateProgress();
     updateProgressDots();
 }
@@ -1232,8 +1057,6 @@ function selectOption(index) {
     options[index].classList.add('selected');
     
     quizState.userAnswers[quizState.currentQuestionIndex] = index;
-    
-    // Immediately update navigation buttons
     updateNavigationButtons();
 }
 
@@ -1243,21 +1066,15 @@ function updateNavigationButtons() {
     const isLastQuestion = quizState.currentQuestionIndex === quizState.questions.length - 1;
     const hasAnswer = quizState.userAnswers[quizState.currentQuestionIndex] !== null;
     
-    // Previous button
     buttons.prev.disabled = isFirstQuestion;
-    
-    // Next button
     buttons.next.disabled = !hasAnswer;
     
-    // Skip button
-    buttons.skip.disabled = isLastQuestion;
-    
-    // Submit button - only show on last question with answer
     if (isLastQuestion && hasAnswer) {
         buttons.submit.style.display = 'block';
-        buttons.submit.disabled = false;
+        buttons.next.style.display = 'none';
     } else {
         buttons.submit.style.display = 'none';
+        buttons.next.style.display = 'flex';
     }
     
     // Update flag button
@@ -1265,13 +1082,6 @@ function updateNavigationButtons() {
     buttons.flag.innerHTML = isFlagged ? 
         '<i class="fas fa-flag"></i> <span class="action-label">Unflag</span>' :
         '<i class="far fa-flag"></i> <span class="action-label">Flag</span>';
-    
-    // Update button text based on last question
-    if (isLastQuestion && hasAnswer) {
-        buttons.next.innerHTML = '<span class="btn-text">Submit Quiz</span> <i class="fas fa-paper-plane"></i>';
-    } else {
-        buttons.next.innerHTML = '<span class="btn-text">Next</span> <i class="fas fa-arrow-right"></i>';
-    }
 }
 
 // Update progress
@@ -1292,19 +1102,6 @@ function showHint() {
     showMessage('Hint 💡', question.explanation, 'info');
     quizState.hintsUsed++;
     buttons.hint.disabled = true;
-}
-
-// Skip question
-function skipQuestion() {
-    const isLastQuestion = quizState.currentQuestionIndex === quizState.questions.length - 1;
-    
-    if (isLastQuestion) {
-        showMessage('Cannot Skip', 'This is the last question. Please answer it.', 'warning');
-        return;
-    }
-    
-    quizState.questionsSkipped++;
-    showNextQuestion();
 }
 
 // Toggle flag
@@ -1338,32 +1135,11 @@ function showQuizHelp() {
         '• Read each question carefully\n' +
         '• Click on an option to select it\n' +
         '• Use the Hint button for explanations\n' +
-        '• Flag questions for review later\n' +
-        '• Skip questions if needed\n' +
+        '• Flag questions for review\n' +
         '• Manage your time wisely\n\n' +
         'Good luck! 🍀', 
         'info'
     );
-}
-
-// Show review
-function showReview() {
-    const flaggedCount = quizState.flaggedQuestions.size;
-    const answeredCount = quizState.userAnswers.filter(a => a !== null).length;
-    const totalQuestions = quizState.questions.length;
-    
-    let reviewText = `Quiz Progress:\n\n`;
-    reviewText += `• Questions answered: ${answeredCount}/${totalQuestions}\n`;
-    reviewText += `• Flagged questions: ${flaggedCount}\n`;
-    reviewText += `• Time remaining: ${quizState.timer}s\n\n`;
-    
-    if (flaggedCount > 0) {
-        reviewText += `Flagged questions: ${Array.from(quizState.flaggedQuestions).map(q => q + 1).join(', ')}`;
-    } else {
-        reviewText += `No questions flagged for review.`;
-    }
-    
-    showMessage('Quiz Review', reviewText, 'info');
 }
 
 // Navigate questions
@@ -1378,19 +1154,16 @@ function showNextQuestion() {
     const hasAnswer = quizState.userAnswers[quizState.currentQuestionIndex] !== null;
     const isLastQuestion = quizState.currentQuestionIndex === quizState.questions.length - 1;
     
-    // If on last question and has answer, submit
     if (isLastQuestion && hasAnswer) {
         submitQuiz();
         return;
     }
     
-    // If on last question but no answer, show message
     if (isLastQuestion && !hasAnswer) {
         showMessage('Answer Required', 'Please select an answer before proceeding.', 'warning');
         return;
     }
     
-    // Otherwise, go to next question
     if (quizState.currentQuestionIndex < quizState.questions.length - 1) {
         quizState.currentQuestionIndex++;
         displayQuestion();
@@ -1410,7 +1183,7 @@ function startTimer() {
             displays.timer.textContent = `${quizState.timer}s`;
             
             if (quizState.timer <= 10) {
-                displays.timer.style.color = 'var(--accent-secondary)';
+                displays.timer.style.color = '#FF6584';
             }
             
             if (quizState.timer <= 0) {
@@ -1448,9 +1221,8 @@ function calculateScore() {
     
     const timeBonus = Math.floor(quizState.timer * 0.5);
     const hintPenalty = quizState.hintsUsed * 5;
-    const skipPenalty = quizState.questionsSkipped * 3;
     
-    quizState.score = Math.max(0, totalPoints + timeBonus - hintPenalty - skipPenalty);
+    quizState.score = Math.max(0, totalPoints + timeBonus - hintPenalty);
     
     console.log(`📊 Score: ${quizState.score} (${correctCount}/${quizState.questions.length} correct)`);
     
@@ -1486,17 +1258,10 @@ function saveHighscore() {
 function showResults() {
     const { correctCount, total } = calculateScore();
     
-    // Update displays
     displays.finalScore.textContent = quizState.score;
     displays.correctAnswers.textContent = `${correctCount}/${total}`;
     displays.timeUsed.textContent = `${60 - quizState.timer}s`;
     
-    const languageName = quizState.selectedLanguage === 'html' ? 'HTML' :
-                        quizState.selectedLanguage === 'css' ? 'CSS' :
-                        quizState.selectedLanguage === 'js' ? 'JavaScript' : 'Full Stack';
-    displays.quizLanguage.textContent = languageName;
-    
-    // Calculate performance
     const percentage = (correctCount / total) * 100;
     let performance = '';
     let rank = '';
@@ -1536,10 +1301,7 @@ function showResults() {
         progressCircle.style.strokeDashoffset = offset;
     }, 300);
     
-    // Update highscores
     updateHighscoresDisplay();
-    
-    // Show results screen
     switchScreen('results');
 }
 
@@ -1553,11 +1315,7 @@ function showAnalysis() {
     analysisText += `• Correct Answers: ${correctCount}/${total} (${Math.round(percentage)}%)\n`;
     analysisText += `• Time Used: ${60 - quizState.timer}s\n`;
     analysisText += `• Hints Used: ${quizState.hintsUsed}\n`;
-    analysisText += `• Questions Skipped: ${quizState.questionsSkipped}\n\n`;
-    
-    if (quizState.hintsUsed > 0) {
-        analysisText += `Tip: Try using fewer hints next time to maximize your score!\n\n`;
-    }
+    analysisText += `• Flagged Questions: ${quizState.flaggedQuestions.size}\n\n`;
     
     if (percentage >= 80) {
         analysisText += `🎉 Excellent performance! You're mastering ${quizState.selectedLanguage.toUpperCase()}!`;
@@ -1599,11 +1357,17 @@ function shareScore() {
             text: shareText,
             url: window.location.href
         }).catch(() => {
-            copyToClipboard(shareText, 'Score copied to clipboard! Share it with your friends!');
+            copyToClipboard(shareText);
         });
     } else {
-        copyToClipboard(shareText, 'Score copied to clipboard! Share it with your friends!');
+        copyToClipboard(shareText);
     }
+}
+
+function copyToClipboard(text) {
+    navigator.clipboard.writeText(text)
+        .then(() => showMessage('Copied!', 'Score copied to clipboard! Share it with your friends!', 'success'))
+        .catch(() => showMessage('Error', 'Could not copy to clipboard.', 'error'));
 }
 
 // Retake quiz
@@ -1613,17 +1377,8 @@ function retakeQuiz() {
 
 // New quiz
 function newQuiz() {
+    quizState.selectedLanguage = null;
     switchScreen('welcome');
-}
-
-// Utility functions
-function shuffleArray(array) {
-    const newArray = [...array];
-    for (let i = newArray.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
-    }
-    return newArray;
 }
 
 // Initialize app

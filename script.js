@@ -1,4 +1,4 @@
-// Enhanced Neomorphic QALICODE Quiz Application
+// Enhanced QALICODE Quiz Application - Fully Responsive
 
 // DOM Elements
 const screens = {
@@ -311,9 +311,6 @@ const questionsDatabase = {
 // Highscores System
 let highscores = JSON.parse(localStorage.getItem('qalicode-highscores')) || [];
 
-// Leaderboard Data
-let leaderboard = JSON.parse(localStorage.getItem('qalicode-leaderboard')) || [];
-
 // Initialize App
 function initApp() {
     console.log("🚀 Initializing Enhanced QALICODE Quiz App...");
@@ -349,9 +346,6 @@ function initApp() {
     // Load highscores
     loadHighscores();
     
-    // Load leaderboard
-    loadLeaderboard();
-    
     // Show welcome screen
     switchScreen('welcome');
 }
@@ -363,10 +357,10 @@ function setupTheme() {
     
     if (savedTheme === 'light') {
         document.body.classList.add('light-mode');
-        buttons.themeToggle.innerHTML = '<i class="fas fa-sun"></i><span>Light Mode</span>';
+        buttons.themeToggle.innerHTML = '<i class="fas fa-sun"></i><span class="theme-text">Light Mode</span>';
     } else {
         document.body.classList.remove('light-mode');
-        buttons.themeToggle.innerHTML = '<i class="fas fa-moon"></i><span>Dark Mode</span>';
+        buttons.themeToggle.innerHTML = '<i class="fas fa-moon"></i><span class="theme-text">Dark Mode</span>';
     }
 }
 
@@ -376,29 +370,29 @@ function toggleTheme() {
         quizState.currentTheme = 'light';
         document.body.classList.add('light-mode');
         localStorage.setItem('qalicode-theme', 'light');
-        buttons.themeToggle.innerHTML = '<i class="fas fa-sun"></i><span>Light Mode</span>';
+        buttons.themeToggle.innerHTML = '<i class="fas fa-sun"></i><span class="theme-text">Light Mode</span>';
     } else {
         quizState.currentTheme = 'dark';
         document.body.classList.remove('light-mode');
         localStorage.setItem('qalicode-theme', 'dark');
-        buttons.themeToggle.innerHTML = '<i class="fas fa-moon"></i><span>Dark Mode</span>';
+        buttons.themeToggle.innerHTML = '<i class="fas fa-moon"></i><span class="theme-text">Dark Mode</span>';
     }
 }
 
 // Create particle background
 function createParticles() {
     const particlesContainer = document.getElementById('particles');
-    const particleCount = 60;
+    const particleCount = window.innerWidth < 768 ? 30 : 50;
     
     for (let i = 0; i < particleCount; i++) {
         const particle = document.createElement('div');
         
         // Random properties
-        const size = Math.random() * 6 + 2;
+        const size = Math.random() * 4 + 1;
         const posX = Math.random() * 100;
         const posY = Math.random() * 100;
-        const duration = Math.random() * 25 + 15;
-        const delay = Math.random() * 10;
+        const duration = Math.random() * 20 + 10;
+        const delay = Math.random() * 5;
         const color = `hsl(${Math.random() * 360}, 70%, 60%)`;
         
         // Apply styles
@@ -410,9 +404,9 @@ function createParticles() {
             border-radius: 50%;
             left: ${posX}%;
             top: ${posY}%;
-            opacity: ${Math.random() * 0.2 + 0.05};
+            opacity: ${Math.random() * 0.15 + 0.05};
             animation: floatParticle ${duration}s infinite linear ${delay}s;
-            filter: blur(${Math.random() * 2}px);
+            filter: blur(${Math.random()}px);
         `;
         
         particlesContainer.appendChild(particle);
@@ -426,13 +420,13 @@ function createParticles() {
                 transform: translate(0, 0) rotate(0deg) scale(1);
             }
             25% {
-                transform: translate(${Math.random() * 60 - 30}px, ${Math.random() * 60 - 30}px) rotate(90deg) scale(${Math.random() * 0.5 + 0.75});
+                transform: translate(${Math.random() * 40 - 20}px, ${Math.random() * 40 - 20}px) rotate(90deg) scale(${Math.random() * 0.5 + 0.75});
             }
             50% {
-                transform: translate(${Math.random() * 60 - 30}px, ${Math.random() * 60 - 30}px) rotate(180deg) scale(${Math.random() * 0.5 + 0.75});
+                transform: translate(${Math.random() * 40 - 20}px, ${Math.random() * 40 - 20}px) rotate(180deg) scale(${Math.random() * 0.5 + 0.75});
             }
             75% {
-                transform: translate(${Math.random() * 60 - 30}px, ${Math.random() * 60 - 30}px) rotate(270deg) scale(${Math.random() * 0.5 + 0.75});
+                transform: translate(${Math.random() * 40 - 20}px, ${Math.random() * 40 - 20}px) rotate(270deg) scale(${Math.random() * 0.5 + 0.75});
             }
         }
     `;
@@ -527,6 +521,25 @@ function setupEventListeners() {
             closeAllModals();
         }
     });
+    
+    // Window resize handler
+    window.addEventListener('resize', handleResize);
+}
+
+// Handle window resize
+function handleResize() {
+    // Update highscore table for mobile/desktop
+    updateHighscoresDisplay();
+    
+    // Update button text visibility for mobile
+    const isMobile = window.innerWidth < 480;
+    document.querySelectorAll('.btn-text').forEach(span => {
+        if (isMobile && span.closest('.question-actions')) {
+            span.style.display = 'none';
+        } else {
+            span.style.display = 'inline';
+        }
+    });
 }
 
 // Initialize language selection
@@ -607,54 +620,7 @@ function loadHighscores() {
     updateHighscoresDisplay();
 }
 
-// Load leaderboard
-function loadLeaderboard() {
-    leaderboard = JSON.parse(localStorage.getItem('qalicode-leaderboard')) || [];
-    updateLeaderboardPreview();
-}
-
-// Update leaderboard preview
-function updateLeaderboardPreview() {
-    const leaderboardList = document.querySelector('.leaderboard-list');
-    
-    if (leaderboard.length === 0) {
-        // Generate sample leaderboard if empty
-        const sampleUsers = [
-            { username: 'CodeMaster', score: 980, language: 'all' },
-            { username: 'WebWizard', score: 950, language: 'js' },
-            { username: 'StyleGuru', score: 920, language: 'css' },
-            { username: 'HTMLHero', score: 890, language: 'html' },
-            { username: 'DevPro', score: 850, language: 'all' }
-        ];
-        
-        leaderboardList.innerHTML = sampleUsers.map((user, index) => `
-            <div class="leaderboard-item">
-                <div class="leaderboard-rank">${index + 1}</div>
-                <div class="leaderboard-user">
-                    <div class="leaderboard-username">${user.username}</div>
-                    <div class="leaderboard-language">${user.language.toUpperCase()}</div>
-                </div>
-                <div class="leaderboard-score">${user.score} pts</div>
-            </div>
-        `).join('');
-    } else {
-        // Display actual leaderboard
-        const topScores = [...leaderboard].sort((a, b) => b.score - a.score).slice(0, 5);
-        
-        leaderboardList.innerHTML = topScores.map((score, index) => `
-            <div class="leaderboard-item">
-                <div class="leaderboard-rank">${index + 1}</div>
-                <div class="leaderboard-user">
-                    <div class="leaderboard-username">${score.username}</div>
-                    <div class="leaderboard-language">${score.language.toUpperCase()}</div>
-                </div>
-                <div class="leaderboard-score">${score.score} pts</div>
-            </div>
-        `).join('');
-    }
-}
-
-// Update highscores display
+// Update highscores display - Responsive
 function updateHighscoresDisplay() {
     const tableBody = displays.highscoresTable;
     tableBody.innerHTML = '';
@@ -662,8 +628,8 @@ function updateHighscoresDisplay() {
     if (highscores.length === 0) {
         tableBody.innerHTML = `
             <div class="no-highscores-message">
-                <i class="fas fa-trophy" style="font-size: 4rem; color: var(--text-secondary); margin-bottom: 25px;"></i>
-                <p style="color: var(--text-secondary); font-size: 1.1rem;">No highscores yet. Complete a quiz to see your scores here!</p>
+                <i class="fas fa-trophy"></i>
+                <p>No highscores yet. Complete a quiz to see your scores here!</p>
                 <button id="start-from-highscores" class="btn-neo-primary btn-medium" style="margin-top: 20px;">
                     <i class="fas fa-play"></i> Start Your First Quiz
                 </button>
@@ -682,8 +648,13 @@ function updateHighscoresDisplay() {
     // Sort by score (descending)
     const sortedHighscores = [...highscores].sort((a, b) => b.score - a.score);
     
-    // Display top 20
-    sortedHighscores.slice(0, 20).forEach((highscore, index) => {
+    // Check if we're on mobile
+    const isMobile = window.innerWidth < 992;
+    
+    // Display top 10 on mobile, top 20 on desktop
+    const displayCount = isMobile ? 10 : 20;
+    
+    sortedHighscores.slice(0, displayCount).forEach((highscore, index) => {
         const row = document.createElement('div');
         row.className = `highscore-row ${highscore.username === quizState.username ? 'current-user' : ''}`;
         
@@ -703,26 +674,58 @@ function updateHighscoresDisplay() {
                              highscore.language === 'css' ? 'css' :
                              highscore.language === 'js' ? 'js' : 'mixed';
         
-        row.innerHTML = `
-            <div class="rank-badge ${rankClass}">${rankText}</div>
-            <div class="language-badge ${languageClass}">
-                <i class="fab fa-${highscore.language === 'html' ? 'html5' : highscore.language === 'css' ? 'css3-alt' : highscore.language === 'js' ? 'js' : 'random'}"></i>
-                ${languageName}
-            </div>
-            <div class="username-cell">${highscore.username}</div>
-            <div class="score-value-cell">${highscore.score}</div>
-            <div class="date-cell">${highscore.date}</div>
-            <div class="action-buttons">
-                <button class="btn-neo-small delete-highscore" data-id="${highscore.timestamp}" title="Delete">
-                    <i class="fas fa-trash"></i>
-                </button>
-                ${highscore.username === quizState.username ? `
-                    <button class="btn-neo-small share-highscore" data-id="${highscore.timestamp}" title="Share">
-                        <i class="fas fa-share-alt"></i>
+        // Create mobile or desktop view
+        if (isMobile) {
+            row.innerHTML = `
+                <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
+                    <div style="display: flex; align-items: center; gap: 15px;">
+                        <div class="rank-badge ${rankClass}">${rankText}</div>
+                        <div>
+                            <div class="username-cell" style="font-size: 1rem; margin-bottom: 5px;">${highscore.username}</div>
+                            <div class="language-badge ${languageClass}">
+                                <i class="fab fa-${highscore.language === 'html' ? 'html5' : highscore.language === 'css' ? 'css3-alt' : highscore.language === 'js' ? 'js' : 'random'}"></i>
+                                ${languageName}
+                            </div>
+                        </div>
+                    </div>
+                    <div style="text-align: right;">
+                        <div class="score-value-cell" style="font-size: 1.3rem;">${highscore.score}</div>
+                        <div class="date-cell" style="font-size: 0.8rem;">${highscore.date}</div>
+                    </div>
+                </div>
+                <div class="action-buttons" style="width: 100%; justify-content: center; margin-top: 10px;">
+                    <button class="btn-neo-small delete-highscore" data-id="${highscore.timestamp}" title="Delete">
+                        <i class="fas fa-trash"></i> Delete
                     </button>
-                ` : ''}
-            </div>
-        `;
+                    ${highscore.username === quizState.username ? `
+                        <button class="btn-neo-small share-highscore" data-id="${highscore.timestamp}" title="Share">
+                            <i class="fas fa-share-alt"></i> Share
+                        </button>
+                    ` : ''}
+                </div>
+            `;
+        } else {
+            row.innerHTML = `
+                <div class="rank-badge ${rankClass}">${rankText}</div>
+                <div class="language-badge ${languageClass}">
+                    <i class="fab fa-${highscore.language === 'html' ? 'html5' : highscore.language === 'css' ? 'css3-alt' : highscore.language === 'js' ? 'js' : 'random'}"></i>
+                    ${languageName}
+                </div>
+                <div class="username-cell">${highscore.username}</div>
+                <div class="score-value-cell">${highscore.score}</div>
+                <div class="date-cell">${highscore.date}</div>
+                <div class="action-buttons">
+                    <button class="btn-neo-small delete-highscore" data-id="${highscore.timestamp}" title="Delete">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                    ${highscore.username === quizState.username ? `
+                        <button class="btn-neo-small share-highscore" data-id="${highscore.timestamp}" title="Share">
+                            <i class="fas fa-share-alt"></i>
+                        </button>
+                    ` : ''}
+                </div>
+            `;
+        }
         
         tableBody.appendChild(row);
     });
@@ -871,14 +874,19 @@ function handleConfirmYes() {
 
 function openModal(modalName) {
     modals[modalName].style.display = 'flex';
+    document.body.style.overflow = 'hidden';
 }
 
 function closeModal(modalName) {
     modals[modalName].style.display = 'none';
+    document.body.style.overflow = '';
 }
 
 function closeAllModals() {
-    Object.values(modals).forEach(modal => modal.style.display = 'none');
+    Object.values(modals).forEach(modal => {
+        modal.style.display = 'none';
+    });
+    document.body.style.overflow = '';
 }
 
 // Auth functions
@@ -1037,8 +1045,10 @@ function switchScreen(screenName) {
         setupQuiz();
     } else if (screenName === 'welcome') {
         updateStatistics();
-        updateLeaderboardPreview();
     }
+    
+    // Close any open modals when switching screens
+    closeAllModals();
 }
 
 // Start quiz
@@ -1103,12 +1113,12 @@ function setupQuiz() {
     displays.timer.style.color = 'var(--text-primary)';
     
     buttons.prev.disabled = true;
-    buttons.next.disabled = false;
-    buttons.submit.style.display = 'none';
+    buttons.next.disabled = true; // Start disabled until answer selected
+    buttons.submit.style.display = 'none'; // Hide initially
     buttons.hint.style.display = 'flex';
     buttons.skip.style.display = 'flex';
     buttons.flag.style.display = 'flex';
-    buttons.pauseQuiz.innerHTML = '<i class="fas fa-pause"></i> Pause';
+    buttons.pauseQuiz.innerHTML = '<i class="fas fa-pause"></i> <span class="btn-text">Pause</span>';
     
     updateQuestionCounter();
     createProgressDots();
@@ -1150,11 +1160,14 @@ function createProgressDots() {
     const dotsContainer = document.querySelector('.progress-dots');
     dotsContainer.innerHTML = '';
     
-    for (let i = 0; i < quizState.questions.length; i++) {
-        const dot = document.createElement('div');
-        dot.className = 'progress-dot';
-        if (i === 0) dot.classList.add('active');
-        dotsContainer.appendChild(dot);
+    // Only show dots on larger screens
+    if (window.innerWidth >= 768) {
+        for (let i = 0; i < quizState.questions.length; i++) {
+            const dot = document.createElement('div');
+            dot.className = 'progress-dot';
+            if (i === 0) dot.classList.add('active');
+            dotsContainer.appendChild(dot);
+        }
     }
 }
 
@@ -1164,6 +1177,19 @@ function updateProgressDots() {
     dots.forEach((dot, index) => {
         dot.classList.toggle('active', index === quizState.currentQuestionIndex);
     });
+}
+
+// Check if we should show submit button
+function checkSubmitButton() {
+    const isLastQuestion = quizState.currentQuestionIndex === quizState.questions.length - 1;
+    const hasAnswer = quizState.userAnswers[quizState.currentQuestionIndex] !== null;
+    
+    if (isLastQuestion && hasAnswer) {
+        buttons.submit.style.display = 'block';
+        buttons.submit.disabled = false;
+    } else {
+        buttons.submit.style.display = 'none';
+    }
 }
 
 // Display question
@@ -1194,6 +1220,7 @@ function displayQuestion() {
     });
     
     updateNavigationButtons();
+    checkSubmitButton();
     updateProgress();
     updateProgressDots();
 }
@@ -1205,27 +1232,46 @@ function selectOption(index) {
     options[index].classList.add('selected');
     
     quizState.userAnswers[quizState.currentQuestionIndex] = index;
-    buttons.next.disabled = false;
+    
+    // Immediately update navigation buttons
+    updateNavigationButtons();
 }
 
 // Update navigation
 function updateNavigationButtons() {
-    buttons.prev.disabled = quizState.currentQuestionIndex === 0;
-    
+    const isFirstQuestion = quizState.currentQuestionIndex === 0;
     const isLastQuestion = quizState.currentQuestionIndex === quizState.questions.length - 1;
     const hasAnswer = quizState.userAnswers[quizState.currentQuestionIndex] !== null;
     
-    buttons.next.disabled = !hasAnswer;
-    buttons.submit.style.display = isLastQuestion && hasAnswer ? 'block' : 'none';
+    // Previous button
+    buttons.prev.disabled = isFirstQuestion;
     
-    buttons.hint.disabled = false;
+    // Next button
+    buttons.next.disabled = !hasAnswer;
+    
+    // Skip button
     buttons.skip.disabled = isLastQuestion;
+    
+    // Submit button - only show on last question with answer
+    if (isLastQuestion && hasAnswer) {
+        buttons.submit.style.display = 'block';
+        buttons.submit.disabled = false;
+    } else {
+        buttons.submit.style.display = 'none';
+    }
     
     // Update flag button
     const isFlagged = quizState.flaggedQuestions.has(quizState.currentQuestionIndex);
     buttons.flag.innerHTML = isFlagged ? 
         '<i class="fas fa-flag"></i> <span class="action-label">Unflag</span>' :
         '<i class="far fa-flag"></i> <span class="action-label">Flag</span>';
+    
+    // Update button text based on last question
+    if (isLastQuestion && hasAnswer) {
+        buttons.next.innerHTML = '<span class="btn-text">Submit Quiz</span> <i class="fas fa-paper-plane"></i>';
+    } else {
+        buttons.next.innerHTML = '<span class="btn-text">Next</span> <i class="fas fa-arrow-right"></i>';
+    }
 }
 
 // Update progress
@@ -1250,6 +1296,13 @@ function showHint() {
 
 // Skip question
 function skipQuestion() {
+    const isLastQuestion = quizState.currentQuestionIndex === quizState.questions.length - 1;
+    
+    if (isLastQuestion) {
+        showMessage('Cannot Skip', 'This is the last question. Please answer it.', 'warning');
+        return;
+    }
+    
     quizState.questionsSkipped++;
     showNextQuestion();
 }
@@ -1270,11 +1323,11 @@ function togglePause() {
     
     if (quizState.isPaused) {
         clearInterval(quizState.timerInterval);
-        buttons.pauseQuiz.innerHTML = '<i class="fas fa-play"></i> Resume';
+        buttons.pauseQuiz.innerHTML = '<i class="fas fa-play"></i> <span class="btn-text">Resume</span>';
         showMessage('Quiz Paused', 'The quiz has been paused. Click Resume to continue.', 'info');
     } else {
         startTimer();
-        buttons.pauseQuiz.innerHTML = '<i class="fas fa-pause"></i> Pause';
+        buttons.pauseQuiz.innerHTML = '<i class="fas fa-pause"></i> <span class="btn-text">Pause</span>';
     }
 }
 
@@ -1322,11 +1375,25 @@ function showPreviousQuestion() {
 }
 
 function showNextQuestion() {
+    const hasAnswer = quizState.userAnswers[quizState.currentQuestionIndex] !== null;
+    const isLastQuestion = quizState.currentQuestionIndex === quizState.questions.length - 1;
+    
+    // If on last question and has answer, submit
+    if (isLastQuestion && hasAnswer) {
+        submitQuiz();
+        return;
+    }
+    
+    // If on last question but no answer, show message
+    if (isLastQuestion && !hasAnswer) {
+        showMessage('Answer Required', 'Please select an answer before proceeding.', 'warning');
+        return;
+    }
+    
+    // Otherwise, go to next question
     if (quizState.currentQuestionIndex < quizState.questions.length - 1) {
         quizState.currentQuestionIndex++;
         displayQuestion();
-    } else if (quizState.userAnswers[quizState.currentQuestionIndex] !== null) {
-        submitQuiz();
     }
 }
 
@@ -1362,7 +1429,6 @@ function submitQuiz() {
     
     if (quizState.isLoggedIn) {
         saveHighscore();
-        updateLeaderboard();
     }
     
     showResults();
@@ -1416,25 +1482,6 @@ function saveHighscore() {
     console.log('💾 Highscore saved:', highscore);
 }
 
-// Update leaderboard
-function updateLeaderboard() {
-    const leaderboardEntry = {
-        username: quizState.username,
-        score: quizState.score,
-        language: quizState.selectedLanguage,
-        date: new Date().toISOString()
-    };
-    
-    leaderboard.push(leaderboardEntry);
-    leaderboard.sort((a, b) => b.score - a.score);
-    
-    if (leaderboard.length > 100) {
-        leaderboard = leaderboard.slice(0, 100);
-    }
-    
-    localStorage.setItem('qalicode-leaderboard', JSON.stringify(leaderboard));
-}
-
 // Show results
 function showResults() {
     const { correctCount, total } = calculateScore();
@@ -1479,7 +1526,7 @@ function showResults() {
     
     // Animate score circle
     const progressCircle = document.querySelector('.ring-progress');
-    const circumference = 2 * Math.PI * 100;
+    const circumference = 2 * Math.PI * 90;
     const offset = circumference - (percentage / 100) * circumference;
     
     progressCircle.style.strokeDasharray = circumference;

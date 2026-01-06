@@ -3,21 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>QALICODE - Interactive Coding Quiz</title>
+    <title>QALICODE - Coding Quiz Platform</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
 </head>
 <body class="dark-mode">
-    <!-- Theme Toggle - Fixed Position -->
-    <div class="theme-toggle-container">
-        <button id="theme-toggle" class="theme-toggle-btn">
-            <i class="fas fa-moon"></i>
-            <span class="theme-text">Dark Mode</span>
-        </button>
-    </div>
-
     <!-- Particle Background -->
     <div class="particles" id="particles"></div>
     
@@ -58,9 +50,9 @@
                         <i class="fas fa-sign-out-alt"></i>
                         <span class="btn-label">Logout</span>
                     </button>
-                    <button id="signup-btn" class="btn-neo signup-btn">
-                        <i class="fas fa-user-plus"></i>
-                        <span class="btn-label">Sign Up</span>
+                    <button id="login-btn-header" class="btn-neo-primary">
+                        <i class="fas fa-sign-in-alt"></i>
+                        <span class="btn-label">Login</span>
                     </button>
                 </div>
             </div>
@@ -72,207 +64,120 @@
         <!-- Welcome Screen -->
         <section id="welcome-screen" class="screen active">
             <div class="welcome-container">
-                <div class="hero-section">
-                    <div class="hero-content">
-                        <div class="hero-badge">
-                            <span class="badge-text">🚀 Interactive Learning</span>
-                        </div>
-                        <h1 class="hero-title animate__animated animate__fadeInDown">
-                            Master <span class="hero-gradient">Web Development</span>
+                <!-- Hero Section -->
+                <div class="hero-section-simple">
+                    <div class="hero-content-simple">
+                        <h1 class="hero-title-simple">
+                            Master Coding Through <span class="hero-gradient">Challenging Quizzes</span>
                         </h1>
-                        <h2 class="hero-subtitle animate__animated animate__fadeInUp animate__delay-1s">
-                            Through <span class="hero-highlight">Challenging Quizzes</span>
-                        </h2>
-                        <p class="hero-description">
-                            Test your skills in HTML, CSS & JavaScript with our interactive quiz platform.<br>
-                            Track progress, compete with others, and become a coding expert!
+                        <p class="hero-description-simple">
+                            Test your skills in HTML, CSS, and JavaScript. Improve your knowledge with instant feedback and detailed explanations.
                         </p>
                         
-                        <div class="hero-actions">
-                            <div class="action-card neo-card">
-                                <div class="action-icon">
-                                    <i class="fas fa-rocket"></i>
+                        <div class="hero-stats-simple">
+                            <div class="stat-card">
+                                <div class="stat-icon-simple">
+                                    <i class="fas fa-trophy"></i>
                                 </div>
-                                <h3>Quick Start</h3>
-                                <p>Jump right into a quiz and test your skills instantly</p>
-                                <button id="quick-start-btn" class="btn-neo-primary btn-large">
-                                    <i class="fas fa-bolt"></i> Quick Quiz
-                                </button>
-                            </div>
-                            
-                            <div class="action-card neo-card">
-                                <div class="action-icon">
-                                    <i class="fas fa-user-graduate"></i>
+                                <div class="stat-content-simple">
+                                    <div class="stat-value" id="total-quizzes">0</div>
+                                    <div class="stat-label">Quizzes Completed</div>
                                 </div>
-                                <h3>Learn & Improve</h3>
-                                <p>Detailed explanations for every answer to help you learn</p>
-                                <button id="learn-more-btn" class="btn-neo-secondary btn-large">
-                                    <i class="fas fa-book"></i> Learn More
-                                </button>
                             </div>
                         </div>
-                    </div>
-                    
-                    <div class="welcome-card neo-card hero-card">
-                        <div class="card-header-neo">
-                            <h3><i class="fas fa-play-circle"></i> Start Your Journey</h3>
-                        </div>
-                        <div class="card-body-neo">
-                            <div class="stats-neo">
-                                <div class="stat-item">
-                                    <div class="stat-icon">
-                                        <i class="fas fa-users"></i>
-                                    </div>
-                                    <div class="stat-content">
-                                        <div class="stat-value" id="total-users">1,500+</div>
-                                        <div class="stat-label">Active Learners</div>
-                                    </div>
-                                </div>
-                                <div class="stat-item">
-                                    <div class="stat-icon">
-                                        <i class="fas fa-trophy"></i>
-                                    </div>
-                                    <div class="stat-content">
-                                        <div class="stat-value" id="total-quizzes">2,300+</div>
-                                        <div class="stat-label">Quizzes Taken</div>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div class="form-group-neo">
-                                <label for="username-input">
-                                    <i class="fas fa-user"></i> Your Username
-                                </label>
-                                <div class="input-container-neo">
-                                    <input type="text" id="username-input" placeholder="Enter your username">
-                                    <div class="input-border"></div>
-                                </div>
-                            </div>
-                            <div class="form-group-neo">
-                                <label for="password-input">
-                                    <i class="fas fa-lock"></i> Password (Optional)
-                                </label>
-                                <div class="input-container-neo">
-                                    <input type="password" id="password-input" placeholder="Password for login">
-                                    <div class="input-border"></div>
-                                </div>
-                                <small class="input-hint">Leave empty for guest mode</small>
-                            </div>
-                            
-                            <div class="button-group-vertical">
-                                <button id="start-quiz-btn" class="btn-neo-primary btn-xlarge animate__animated animate__pulse animate__infinite animate__slower">
-                                    <i class="fas fa-play-circle"></i> Start Quiz Now
-                                </button>
-                                <div class="button-row">
-                                    <button id="login-btn" class="btn-neo-secondary btn-medium">
-                                        <i class="fas fa-sign-in-alt"></i> Login
-                                    </button>
-                                    <button id="demo-btn" class="btn-neo-outline btn-medium">
-                                        <i class="fas fa-eye"></i> Try Demo
-                                    </button>
-                                </div>
-                            </div>
+                        
+                        <div class="hero-cta">
+                            <button id="get-started-btn" class="btn-neo-primary btn-xlarge animate__animated animate__pulse animate__infinite animate__slower">
+                                <i class="fas fa-play-circle"></i> Get Started
+                            </button>
+                            <button id="demo-btn" class="btn-neo-outline btn-large">
+                                <i class="fas fa-eye"></i> Try Demo
+                            </button>
                         </div>
                     </div>
                 </div>
                 
-                <div class="features-section">
-                    <div class="section-header">
-                        <h2>Choose Your Coding Challenge</h2>
-                        <p>Select a technology and test your expertise</p>
+                <!-- Language Selection -->
+                <div class="language-selection-section">
+                    <div class="section-header-simple">
+                        <h2>Choose Your Quiz</h2>
+                        <p>Select a technology to test your expertise</p>
                     </div>
                     
-                    <div class="language-grid">
-                        <div class="language-card neo-card language-card-html" data-language="html">
-                            <div class="language-icon html">
+                    <div class="language-grid-simple">
+                        <div class="language-card-simple" data-language="html">
+                            <div class="language-icon-simple html">
                                 <i class="fab fa-html5"></i>
                             </div>
-                            <div class="language-content">
-                                <h4>HTML5</h4>
+                            <div class="language-info-simple">
+                                <h3>HTML</h3>
                                 <p>Markup & Structure</p>
-                                <div class="language-stats">
-                                    <span><i class="fas fa-question-circle"></i> 15 Questions</span>
-                                    <span class="difficulty easy">Beginner</span>
-                                </div>
-                                <div class="language-progress">
-                                    <div class="progress-bar">
-                                        <div class="progress-fill" style="width: 85%"></div>
-                                    </div>
-                                    <span>85% Completion Rate</span>
-                                </div>
+                                <div class="difficulty-badge beginner">Beginner</div>
                             </div>
-                            <button class="language-select-btn" data-language="html">
-                                <i class="fas fa-arrow-right"></i>
+                            <button class="language-start-btn" data-language="html">
+                                Start <i class="fas fa-arrow-right"></i>
                             </button>
                         </div>
                         
-                        <div class="language-card neo-card language-card-css" data-language="css">
-                            <div class="language-icon css">
+                        <div class="language-card-simple" data-language="css">
+                            <div class="language-icon-simple css">
                                 <i class="fab fa-css3-alt"></i>
                             </div>
-                            <div class="language-content">
-                                <h4>CSS3</h4>
+                            <div class="language-info-simple">
+                                <h3>CSS</h3>
                                 <p>Styling & Layout</p>
-                                <div class="language-stats">
-                                    <span><i class="fas fa-question-circle"></i> 15 Questions</span>
-                                    <span class="difficulty medium">Intermediate</span>
-                                </div>
-                                <div class="language-progress">
-                                    <div class="progress-bar">
-                                        <div class="progress-fill" style="width: 78%"></div>
-                                    </div>
-                                    <span>78% Completion Rate</span>
-                                </div>
+                                <div class="difficulty-badge intermediate">Intermediate</div>
                             </div>
-                            <button class="language-select-btn" data-language="css">
-                                <i class="fas fa-arrow-right"></i>
+                            <button class="language-start-btn" data-language="css">
+                                Start <i class="fas fa-arrow-right"></i>
                             </button>
                         </div>
                         
-                        <div class="language-card neo-card language-card-js" data-language="js">
-                            <div class="language-icon js">
+                        <div class="language-card-simple" data-language="js">
+                            <div class="language-icon-simple js">
                                 <i class="fab fa-js"></i>
                             </div>
-                            <div class="language-content">
-                                <h4>JavaScript</h4>
+                            <div class="language-info-simple">
+                                <h3>JavaScript</h3>
                                 <p>Logic & Interactivity</p>
-                                <div class="language-stats">
-                                    <span><i class="fas fa-question-circle"></i> 15 Questions</span>
-                                    <span class="difficulty hard">Advanced</span>
-                                </div>
-                                <div class="language-progress">
-                                    <div class="progress-bar">
-                                        <div class="progress-fill" style="width: 65%"></div>
-                                    </div>
-                                    <span>65% Completion Rate</span>
-                                </div>
+                                <div class="difficulty-badge advanced">Advanced</div>
                             </div>
-                            <button class="language-select-btn" data-language="js">
-                                <i class="fas fa-arrow-right"></i>
+                            <button class="language-start-btn" data-language="js">
+                                Start <i class="fas fa-arrow-right"></i>
                             </button>
                         </div>
+                    </div>
+                </div>
+                
+                <!-- Features Section -->
+                <div class="features-section-simple">
+                    <div class="section-header-simple">
+                        <h2>Why Choose QALICODE?</h2>
+                    </div>
+                    
+                    <div class="features-grid">
+                        <div class="feature-card">
+                            <div class="feature-icon">
+                                <i class="fas fa-bolt"></i>
+                            </div>
+                            <h3>Instant Feedback</h3>
+                            <p>Get immediate explanations for every answer to learn faster.</p>
+                        </div>
                         
-                        <div class="language-card neo-card language-card-all" data-language="all">
-                            <div class="language-icon all">
-                                <i class="fas fa-random"></i>
+                        <div class="feature-card">
+                            <div class="feature-icon">
+                                <i class="fas fa-chart-line"></i>
                             </div>
-                            <div class="language-content">
-                                <h4>Full Stack</h4>
-                                <p>All Technologies</p>
-                                <div class="language-stats">
-                                    <span><i class="fas fa-question-circle"></i> 20 Questions</span>
-                                    <span class="difficulty expert">Expert</span>
-                                </div>
-                                <div class="language-progress">
-                                    <div class="progress-bar">
-                                        <div class="progress-fill" style="width: 55%"></div>
-                                    </div>
-                                    <span>55% Completion Rate</span>
-                                </div>
+                            <h3>Track Progress</h3>
+                            <p>Monitor your improvement with detailed performance analytics.</p>
+                        </div>
+                        
+                        <div class="feature-card">
+                            <div class="feature-icon">
+                                <i class="fas fa-trophy"></i>
                             </div>
-                            <button class="language-select-btn" data-language="all">
-                                <i class="fas fa-arrow-right"></i>
-                            </button>
+                            <h3>Compete & Learn</h3>
+                            <p>Challenge yourself with our ranking system and highscore boards.</p>
                         </div>
                     </div>
                 </div>
@@ -352,10 +257,6 @@
                                     <i class="fas fa-lightbulb"></i>
                                     <span class="action-label">Hint</span>
                                 </button>
-                                <button id="skip-btn" class="btn-neo-icon skip-btn" title="Skip Question">
-                                    <i class="fas fa-forward"></i>
-                                    <span class="action-label">Skip</span>
-                                </button>
                                 <button id="flag-btn" class="btn-neo-icon flag-btn" title="Flag Question">
                                     <i class="far fa-flag"></i>
                                     <span class="action-label">Flag</span>
@@ -374,9 +275,6 @@
                             <i class="fas fa-arrow-left"></i> <span class="btn-text">Previous</span>
                         </button>
                         <div class="navigation-center">
-                            <button id="review-btn" class="btn-neo-outline btn-medium">
-                                <i class="fas fa-eye"></i> <span class="btn-text">Review</span>
-                            </button>
                             <button id="next-btn" class="btn-neo-primary btn-large nav-btn">
                                 <span class="btn-text">Next</span> <i class="fas fa-arrow-right"></i>
                             </button>
@@ -467,9 +365,6 @@
                             <button id="export-highscores" class="btn-neo-small">
                                 <i class="fas fa-download"></i> <span class="btn-text">Export</span>
                             </button>
-                            <button id="clear-highscores-btn" class="btn-neo-small danger-btn">
-                                <i class="fas fa-trash"></i> <span class="btn-text">Clear All</span>
-                            </button>
                         </div>
                     </div>
                     
@@ -481,7 +376,6 @@
                                 <div class="table-cell user">Username</div>
                                 <div class="table-cell score">Score</div>
                                 <div class="table-cell date">Date</div>
-                                <div class="table-cell actions">Actions</div>
                             </div>
                         </div>
                         <div class="table-body" id="highscores-table">
@@ -499,76 +393,28 @@
         </section>
     </main>
 
-    <!-- Modals -->
-    <div id="signup-modal" class="modal-neo">
+    <!-- Auth Modal -->
+    <div id="auth-modal" class="modal-neo">
         <div class="modal-content-neo">
             <div class="modal-header-neo">
-                <h2><i class="fas fa-user-plus"></i> Create Your Account</h2>
+                <h2><i class="fas fa-user-circle"></i> Welcome to QALICODE</h2>
                 <button class="close-modal-neo">&times;</button>
             </div>
             <div class="modal-body-neo">
-                <form id="signup-form" class="form-neo">
-                    <div class="form-group-neo">
-                        <label for="fullname">
-                            <i class="fas fa-user"></i> Full Name
-                        </label>
-                        <div class="input-container-neo">
-                            <input type="text" id="fullname" placeholder="Enter your full name" required>
-                            <div class="input-border"></div>
-                        </div>
-                    </div>
-                    <div class="form-group-neo">
-                        <label for="email">
-                            <i class="fas fa-envelope"></i> Email Address
-                        </label>
-                        <div class="input-container-neo">
-                            <input type="email" id="email" placeholder="Enter your email" required>
-                            <div class="input-border"></div>
-                        </div>
-                    </div>
-                    <div class="form-group-neo">
-                        <label for="modal-username">
-                            <i class="fas fa-at"></i> Username
-                        </label>
-                        <div class="input-container-neo">
-                            <input type="text" id="modal-username" placeholder="Choose a username" required>
-                            <div class="input-border"></div>
-                        </div>
-                    </div>
-                    <div class="form-group-neo">
-                        <label for="modal-password">
-                            <i class="fas fa-lock"></i> Password
-                        </label>
-                        <div class="input-container-neo">
-                            <input type="password" id="modal-password" placeholder="Create a password" required minlength="6">
-                            <div class="input-border"></div>
-                        </div>
-                    </div>
-                    <button type="submit" class="btn-neo-primary btn-xlarge btn-full">
-                        <i class="fas fa-user-plus"></i> Create Account
-                    </button>
-                </form>
-                <div class="modal-footer-neo">
-                    <p>Already have an account? <a href="#" id="switch-to-login" class="modal-link">Login here</a></p>
+                <div class="auth-tabs">
+                    <button class="auth-tab active" data-tab="login">Login</button>
+                    <button class="auth-tab" data-tab="signup">Sign Up</button>
+                    <button class="auth-tab" data-tab="recover">Recover Password</button>
                 </div>
-            </div>
-        </div>
-    </div>
-
-    <div id="login-modal" class="modal-neo">
-        <div class="modal-content-neo">
-            <div class="modal-header-neo">
-                <h2><i class="fas fa-sign-in-alt"></i> Login to QALICODE</h2>
-                <button class="close-modal-neo">&times;</button>
-            </div>
-            <div class="modal-body-neo">
-                <form id="login-form" class="form-neo">
+                
+                <!-- Login Form -->
+                <form id="login-form" class="auth-form active" data-form="login">
                     <div class="form-group-neo">
                         <label for="login-username">
-                            <i class="fas fa-user"></i> Username
+                            <i class="fas fa-user"></i> Username or Email
                         </label>
                         <div class="input-container-neo">
-                            <input type="text" id="login-username" placeholder="Enter your username" required>
+                            <input type="text" id="login-username" placeholder="Enter your username or email" required>
                             <div class="input-border"></div>
                         </div>
                     </div>
@@ -582,16 +428,92 @@
                         </div>
                     </div>
                     <button type="submit" class="btn-neo-primary btn-xlarge btn-full">
-                        <i class="fas fa-sign-in-alt"></i> Login to Account
+                        <i class="fas fa-sign-in-alt"></i> Login to Continue
                     </button>
                 </form>
-                <div class="modal-footer-neo">
-                    <p>Don't have an account? <a href="#" id="switch-to-signup" class="modal-link">Sign up here</a></p>
-                </div>
+                
+                <!-- Signup Form -->
+                <form id="signup-form" class="auth-form" data-form="signup">
+                    <div class="form-group-neo">
+                        <label for="signup-username">
+                            <i class="fas fa-user"></i> Username
+                        </label>
+                        <div class="input-container-neo">
+                            <input type="text" id="signup-username" placeholder="Choose a username" required minlength="3">
+                            <div class="input-border"></div>
+                        </div>
+                        <div class="input-feedback" id="username-feedback"></div>
+                    </div>
+                    <div class="form-group-neo">
+                        <label for="signup-email">
+                            <i class="fas fa-envelope"></i> Email Address
+                        </label>
+                        <div class="input-container-neo">
+                            <input type="email" id="signup-email" placeholder="Enter your email" required>
+                            <div class="input-border"></div>
+                        </div>
+                    </div>
+                    <div class="form-group-neo">
+                        <label for="signup-password">
+                            <i class="fas fa-lock"></i> Password
+                        </label>
+                        <div class="input-container-neo">
+                            <input type="password" id="signup-password" placeholder="Create a strong password" required minlength="8">
+                            <div class="input-border"></div>
+                        </div>
+                        <div class="password-strength">
+                            <div class="strength-bar">
+                                <div class="strength-fill" id="password-strength-bar"></div>
+                            </div>
+                            <div class="strength-text" id="password-strength-text">Password strength</div>
+                        </div>
+                        <div class="password-requirements">
+                            <p>Password must contain:</p>
+                            <ul>
+                                <li id="req-length">At least 8 characters</li>
+                                <li id="req-uppercase">One uppercase letter</li>
+                                <li id="req-lowercase">One lowercase letter</li>
+                                <li id="req-number">One number</li>
+                                <li id="req-special">One special character</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="form-group-neo">
+                        <label for="confirm-password">
+                            <i class="fas fa-lock"></i> Confirm Password
+                        </label>
+                        <div class="input-container-neo">
+                            <input type="password" id="confirm-password" placeholder="Confirm your password" required>
+                            <div class="input-border"></div>
+                        </div>
+                        <div class="input-feedback" id="confirm-feedback"></div>
+                    </div>
+                    <button type="submit" class="btn-neo-primary btn-xlarge btn-full">
+                        <i class="fas fa-user-plus"></i> Create Account
+                    </button>
+                </form>
+                
+                <!-- Password Recovery Form -->
+                <form id="recover-form" class="auth-form" data-form="recover">
+                    <div class="form-group-neo">
+                        <label for="recover-email">
+                            <i class="fas fa-envelope"></i> Email Address
+                        </label>
+                        <div class="input-container-neo">
+                            <input type="email" id="recover-email" placeholder="Enter your email address" required>
+                            <div class="input-border"></div>
+                        </div>
+                        <p class="recovery-note">We'll send you a password reset link to your email.</p>
+                    </div>
+                    <button type="submit" class="btn-neo-primary btn-xlarge btn-full">
+                        <i class="fas fa-key"></i> Send Reset Link
+                    </button>
+                </form>
             </div>
         </div>
     </div>
 
+    <!-- Message Modal -->
     <div id="message-modal" class="modal-neo">
         <div class="modal-content-neo">
             <div class="modal-header-neo">
@@ -605,12 +527,12 @@
                 <p id="message-text" class="message-text">Message content</p>
                 <div class="message-actions">
                     <button id="message-ok-btn" class="btn-neo-primary btn-large">OK</button>
-                    <button id="message-cancel-btn" class="btn-neo-outline btn-large" style="display: none;">Cancel</button>
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- Confirm Modal -->
     <div id="confirm-modal" class="modal-neo">
         <div class="modal-content-neo">
             <div class="modal-header-neo">
@@ -641,20 +563,15 @@
                         </div>
                         <div class="logo-text-container">
                             <h3>QALICODE</h3>
-                            <p>Elevate your coding skills through quizzes</p>
+                            <p>Master coding through quizzes</p>
                         </div>
                     </div>
                 </div>
                 <div class="footer-info">
-                    <p class="footer-tagline">The ultimate platform for mastering web development through interactive challenges</p>
                     <div class="footer-stats">
                         <div class="footer-stat">
-                            <i class="fas fa-users"></i>
-                            <span id="footer-user-count">1,500+</span> Learners
-                        </div>
-                        <div class="footer-stat">
                             <i class="fas fa-trophy"></i>
-                            <span id="footer-quiz-count">2,300+</span> Quizzes
+                            <span id="footer-quiz-count">0</span> Quizzes Completed
                         </div>
                     </div>
                     <p class="copyright">© 2025 QALICODE. All rights reserved.</p>
